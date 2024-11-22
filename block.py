@@ -1,3 +1,5 @@
+from typing import List, Union
+
 class BlockType:
     # properties
     STREET = 1

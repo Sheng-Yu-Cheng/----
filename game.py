@@ -1,21 +1,16 @@
 from block import *
 from player import *
-
-# game status:
-# wait commnd
-# do animation
-
-
-class GameStatus:
-    WAIT_PLAYER_COMMAND = 0
-    DOING_ANIMATION = 1
+from typing import List, Union
 
 class Game:
-    def __init__(self, blocks, players):
+    def __init__(self, blocks: List[Union[StreetBlock, RailroadBlock, UtilityBlock]], players: List[Player]):
         self.block_amount = len(blocks)
         self.blocks = blocks
         self.player_amount = len(players)
         self.players = players
-        self.status = GameStatus.WAIT_PLAYER_COMMAND
-    def rollDice(self, ):
-        
+    def playerGoAhead(self, player_index, steps):
+        self.players[player_index].position += steps
+        self.players[player_index].position %= self.block_amount
+        return self.blocks[self.players[player_index].position]
+    
+
