@@ -1,5 +1,6 @@
 # Example file showing a basic pygame "game loop"
 import pygame
+from game_board import *
 from subwindows import *
 from font_machine import *
 
@@ -13,6 +14,9 @@ sean = Player("Sean Cheng", 0, 0, [], 25000)
 action_menu = ActionMenuWindow((1280, 720))
 action_menu.updateWidtthPlayer(sean)
 
+classic = generateClassicGameBoard()
+
+
 while running:
     # poll for events
     # pygame.QUIT event means the user clicked X to close your window
@@ -20,7 +24,7 @@ while running:
         if event.type == pygame.QUIT:
             running = False
     
-    screen.fill("purple")
+    classic.renderToScreen(screen)    
     action_menu.renderToScreen(screen)
     
     pygame.display.flip()

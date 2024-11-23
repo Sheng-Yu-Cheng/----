@@ -45,7 +45,7 @@ class Block:
 
 class PropertyBlock(Block):
     def __init__(self, image: pygame.Surface, name, type, index, purchase_price, mortagate_price, rent_chart, owner, status):
-        super(Block).__init__(image, name, type, index, status)
+        super().__init__(image, name, type, index, status)
         self.owner = owner
         # monetary variables
         self.purchase_price = purchase_price
@@ -54,7 +54,7 @@ class PropertyBlock(Block):
 
 class StreetBlock(PropertyBlock):
     def __init__(self, image: pygame.Surface, name, index, purchase_price, mortagate_price, house_price_chart, rent_chart, color_group, house_amount, owner = None, status = BlockStatus.ENABLED | BlockStatus.UNOWNED | BlockStatus.UNMORTGAGED):
-        super(PropertyBlock).__init__(image, name, BlockType.STREET, index, purchase_price, mortagate_price, rent_chart, owner, status)
+        super().__init__(image, name, BlockType.STREET, index, purchase_price, mortagate_price, rent_chart, owner, status)
         self.color_group = color_group
         self.house_price_chart = house_price_chart
         self.house_amount = house_amount
