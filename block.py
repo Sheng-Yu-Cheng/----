@@ -5,17 +5,21 @@ class BlockType:
     STREET = 1
     RAILROAD = 2
     UTILITY = 3
+    PROPERTIES = (1, 2, 3)
     # event
     CHANCE = 4
     COMMUNITY_CHEST = 5
+    EVENT = (4, 5)
     # tax
     LUXURY_TAX = 6
     INCOME_TAX = 7
+    TAX = (6, 7)
     # corners
     START = 8
     IN_JAIL_OR_JUST_VISITING = 9
     FREE_PARKING = 10
     IMPRISON = 11
+    CORNER = (8, 9, 10, 11)
     
 class BlockStatus:
     # basic (1 bit)
@@ -99,6 +103,7 @@ class FreeParkingBlock(Block):
         super(Block).__init__(name, BlockType.FREE_PARKING, index, status)
         self.jackpot = jackpot
 
-class InJailOrJustVisitingBlock(Block):
+class ImprisonBlock(Block):
     def __init__(self, name, index, status = BlockStatus.ENABLED):
         super(Block).__init__(name, BlockType.IMPRISON, index, status)
+
