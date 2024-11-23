@@ -23,14 +23,12 @@ class BlockType:
     CORNER = (8, 9, 10, 11)
     
 class BlockStatus:
-    # basic (1 bit)
-    DISABLED = 0b0
-    ENABLED = 0b1
+    # basic (2 bit)
+    ENABLED = 0b0001
+    SELECTED = 0b0010
     # properties (2 bit)
-    UNOWNED = 0b000
-    OWNED = 0b010
-    MORTGAGED = 0b000
-    UNMORTGAGED = 0b100
+    OWNED = 0b0100
+    UNMORTGAGED = 0b1000
 
 
 class Block:
@@ -42,7 +40,15 @@ class Block:
         # 
         self.image = image
         self.rect = self.image.get_rect()
-
+    def generateMask(self):
+        self.disabled_mask = pygame.Surface((self.rect.width, self.rect.height), pygame.SRCALPHA)
+        self.disabled_mask.fill((0, 0, 0, 100))
+        self.disabled_mask_rect = self.disabled_mask.get_rect()
+        self.disabled_mask_rect.topleft = self.rect.topleft
+        self.selected_mask = pygame.Surface((self.rect.width, self.rect.height), pygame.SRCALPHA)
+        self.selected_mask.fill((255, 255, 0, 100))
+        self.selected_mask_rect = self.selected_mask.get_rect()
+        self.selected_mask_rect.topleft = self.rect.topleft
 class PropertyBlock(Block):
     def __init__(self, image: pygame.Surface, name, type, index, purchase_price, mortagate_price, rent_chart, owner, status):
         super().__init__(image, name, type, index, status)
@@ -53,23 +59,23 @@ class PropertyBlock(Block):
         self.rent_chart = rent_chart
 
 class StreetBlock(PropertyBlock):
-    def __init__(self, image: pygame.Surface, name, index, purchase_price, mortagate_price, house_price_chart, rent_chart, color_group, house_amount, owner = None, status = BlockStatus.ENABLED | BlockStatus.UNOWNED | BlockStatus.UNMORTGAGED):
+    def __init__(self, image: pygame.Surface, name, index, purchase_price, mortagate_price, house_price_chart, rent_chart, color_group, house_amount, owner = None, status = BlockStatus.ENABLED | BlockStatus.UNMORTGAGED):
         super().__init__(image, name, BlockType.STREET, index, purchase_price, mortagate_price, rent_chart, owner, status)
         self.color_group = color_group
         self.house_price_chart = house_price_chart
         self.house_amount = house_amount
 
 class RailroadBlock(PropertyBlock):
-    def __init__(self, image: pygame.Surface, name, index, purchase_price, mortagate_price, rent_chart, owner = None, status = BlockStatus.ENABLED | BlockStatus.UNOWNED | BlockStatus.UNMORTGAGED):
-        super().__init__(image, name, BlockType.RAILROAD, index, purchase_price, mortagate_price, rent_chart, owner, status, image)
+    def __init__(self, image: pygame.Surface, name, index, purchase_price, mortagate_price, rent_chart, owner = None, status = BlockStatus.ENABLED | BlockStatus.UNMORTGAGED):
+        super().__init__(image, name, BlockType.RAILROAD, index, purchase_price, mortagate_price, rent_chart, owner, status)
 
 class UtilityBlock(PropertyBlock):
-    def __init__(self, image: pygame.Surface, name, index, purchase_price, mortagate_price, rent_chart, owner = None, status = BlockStatus.ENABLED | BlockStatus.UNOWNED | BlockStatus.UNMORTGAGED):
-        super().__init__(image, name, BlockType.UTILITY, index, purchase_price, mortagate_price, rent_chart, owner, status, image)
+    def __init__(self, image: pygame.Surface, name, index, purchase_price, mortagate_price, rent_chart, owner = None, status = BlockStatus.ENABLED | BlockStatus.UNMORTGAGED):
+        super().__init__(image, name, BlockType.UTILITY, index, purchase_price, mortagate_price, rent_chart, owner, status)
 
 class EventBlock(Block):
     def __init__(self, image: pygame.Surface, name, type, index, deck, status):
-        super().__init__(image, name, type, index, status, image)
+        super().__init__(image, name, type, index, status)
         self.deck = deck
 
 class ChanceBlock(EventBlock):

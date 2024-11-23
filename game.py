@@ -2,10 +2,12 @@ from block import *
 from player import *
 from game_board import *
 from action_menu import *
-from typing import List, Union
+from typing import List, Union, Callable
 
 class GameStatus:
     GENERAL = 0
+    SELLING = 1
+    MORTGAGING = 2
 
 
 class Game:
@@ -17,13 +19,38 @@ class Game:
         self.players = players
         self.action_menu = ActionMenuWindow(screen_size)
         self.status = status
+        #
+        self.now_player_index = 0
+        self.block_on_selection = -1
     def playerGoAhead(self, player_index, steps):
         self.players[player_index].position += steps
         self.players[player_index].position %= self.block_amount
         return self.blocks[self.players[player_index].position]
     def renderToScreen(self, screen: pygame.Surface):
         self.action_menu.renderToScreen(screen)
+        self.board.renderToScreen(screen)
+    def generateCollideRectAndFunctionList(self):
+        rect_and_func: List[Tuple[pygame.Rect, Callable]] = []
         if self.status == GameStatus.GENERAL:
-            self.board.renderToScreen(screen, [False for _ in range(self.block_amount)])
-    
+            for block in self.board.blocks:
+                def selectionFunction(): 
+                    self.block_on_selection = block.index
+                rect_and_func.append((block.rect, selectionFunction))
+        elif self.status == GameStatus.SELLING or self.status == GameStatus.MORTGAGING:
+            for block in self.board.blocks:
+                if not isinstance(block, (StreetBlock, RailroadBlock, UtilityBlock)) or block.owner != self.now_player_index:
+                    block.status &= 0b1110
+                    continue
+                block.status |= 0b0001
+                def generator(blk):
+                    def func():
+                        self.block_on_selection = blk.index
+                        blk.status ^= BlockStatus.SELECTED
+                    return func
+                rect_and_func.append((block.rect, generator(block)))
+        return rect_and_func
+    def debug(self):
+        print("Block stats: ", end = '')
+        for block in self.board.blocks:
+            print(block.status, end = ' ')
 
