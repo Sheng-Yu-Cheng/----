@@ -1,3 +1,4 @@
+import pygame
 from typing import List, Union
 
 class BlockType:
@@ -33,15 +34,18 @@ class BlockStatus:
 
 
 class Block:
-    def __init__(self, name, type, index, status):
+    def __init__(self, image: pygame.Surface, name, type, index, status):
         self.name = name
         self.type = type
         self.index = index
         self.status = status
+        # 
+        self.image = image
+        self.rect = self.image.get_rect()
 
 class PropertyBlock(Block):
-    def __init__(self, name, type, index, purchase_price, mortagate_price, rent_chart, owner, status):
-        super(Block).__init__(name, type, index, status)
+    def __init__(self, image: pygame.Surface, name, type, index, purchase_price, mortagate_price, rent_chart, owner, status):
+        super(Block).__init__(image, name, type, index, status)
         self.owner = owner
         # monetary variables
         self.purchase_price = purchase_price
@@ -49,61 +53,61 @@ class PropertyBlock(Block):
         self.rent_chart = rent_chart
 
 class StreetBlock(PropertyBlock):
-    def __init__(self, name, index, purchase_price, mortagate_price, house_price_chart, rent_chart, color_group, house_amount, owner = None, status = BlockStatus.ENABLED | BlockStatus.UNOWNED | BlockStatus.UNMORTGAGED):
-        super(PropertyBlock).__init__(name, BlockType.STREET, index, purchase_price, mortagate_price, rent_chart, owner, status)
+    def __init__(self, image: pygame.Surface, name, index, purchase_price, mortagate_price, house_price_chart, rent_chart, color_group, house_amount, owner = None, status = BlockStatus.ENABLED | BlockStatus.UNOWNED | BlockStatus.UNMORTGAGED):
+        super(PropertyBlock).__init__(image, name, BlockType.STREET, index, purchase_price, mortagate_price, rent_chart, owner, status)
         self.color_group = color_group
         self.house_price_chart = house_price_chart
         self.house_amount = house_amount
 
 class RailroadBlock(PropertyBlock):
-    def __init__(self, name, index, purchase_price, mortagate_price, rent_chart, owner = None, status = BlockStatus.ENABLED | BlockStatus.UNOWNED | BlockStatus.UNMORTGAGED):
-        super(PropertyBlock).__init__(name, BlockType.RAILROAD, index, purchase_price, mortagate_price, rent_chart, owner, status)
+    def __init__(self, image: pygame.Surface, name, index, purchase_price, mortagate_price, rent_chart, owner = None, status = BlockStatus.ENABLED | BlockStatus.UNOWNED | BlockStatus.UNMORTGAGED):
+        super(PropertyBlock).__init__(image, name, BlockType.RAILROAD, index, purchase_price, mortagate_price, rent_chart, owner, status, image)
 
 class UtilityBlock(PropertyBlock):
-    def __init__(self, name, index, purchase_price, mortagate_price, rent_chart, owner = None, status = BlockStatus.ENABLED | BlockStatus.UNOWNED | BlockStatus.UNMORTGAGED):
-        super(PropertyBlock).__init__(name, BlockType.UTILITY, index, purchase_price, mortagate_price, rent_chart, owner, status)
+    def __init__(self, image: pygame.Surface, name, index, purchase_price, mortagate_price, rent_chart, owner = None, status = BlockStatus.ENABLED | BlockStatus.UNOWNED | BlockStatus.UNMORTGAGED):
+        super(PropertyBlock).__init__(image, name, BlockType.UTILITY, index, purchase_price, mortagate_price, rent_chart, owner, status, image)
 
 class EventBlock(Block):
-    def __init__(self, name, type, index, deck, status):
-        super(Block).__init__(name, type, index, status)
+    def __init__(self, image: pygame.Surface, name, type, index, deck, status):
+        super(Block).__init__(image, name, type, index, status, image)
         self.deck = deck
 
 class ChanceBlock(EventBlock):
-    def __init__(self, name, index, chance_card_deck, status = BlockStatus.ENABLED):
-        super(EventBlock).__init__(name, BlockType.CHANCE, index, chance_card_deck, status)
+    def __init__(self, image: pygame.Surface, name, index, chance_card_deck, status = BlockStatus.ENABLED):
+        super(EventBlock).__init__(image, name, BlockType.CHANCE, index, chance_card_deck, status)
 
 class CommunityChestBlock(EventBlock):
-    def __init__(self, name, index, community_chest_deck, status = BlockStatus.ENABLED):
-        super(EventBlock).__init__(name, BlockType.COMMUNITY_CHEST, index, community_chest_deck, status)
+    def __init__(self, image: pygame.Surface, name, index, community_chest_deck, status = BlockStatus.ENABLED):
+        super(EventBlock).__init__(image, name, BlockType.COMMUNITY_CHEST, index, community_chest_deck, status)
 
 class TaxBlock(Block):
-    def __init__(self, name, type, index, tax, status):
-        super(Block).__init__(name, type, index, status)
+    def __init__(self, image: pygame.Surface, name, type, index, tax, status):
+        super(Block).__init__(image, name, type, index, status)
         self.tax = tax
 
 class LuxuryTaxBlock(TaxBlock):
-    def __init__(self, name, index, luxury_tax, status = BlockStatus.ENABLED):
-        super(TaxBlock).__init__(name, BlockType.LUXURY_TAX, index, luxury_tax, status)
+    def __init__(self, image: pygame.Surface, name, index, luxury_tax, status = BlockStatus.ENABLED):
+        super(TaxBlock).__init__(image, name, BlockType.LUXURY_TAX, index, luxury_tax, status)
 
 class IncomeTaxBlock(TaxBlock):
-    def __init__(self, name, index, income_tax, status = BlockStatus.ENABLED):
-        super(TaxBlock).__init__(name, BlockType.INCOME_TAX, index, income_tax, status)
+    def __init__(self, image: pygame.Surface, name, index, income_tax, status = BlockStatus.ENABLED):
+        super(TaxBlock).__init__(image, name, BlockType.INCOME_TAX, index, income_tax, status)
 
 class StartBlock(Block):
-    def __init__(self, name, index, salary, status = BlockStatus.ENABLED):
-        super(Block).__init__(name, BlockType.START, index, status)
+    def __init__(self, image: pygame.Surface, name, index, salary, status = BlockStatus.ENABLED):
+        super(Block).__init__(image, name, BlockType.START, index, status)
         self.salary = salary
 
 class InJailOrJustVisitingBlock(Block):
-    def __init__(self, name, index, status = BlockStatus.ENABLED):
-        super(Block).__init__(name, BlockType.IN_JAIL_OR_JUST_VISITING, index, status)
+    def __init__(self, image: pygame.Surface, name, index, status = BlockStatus.ENABLED):
+        super(Block).__init__(image, name, BlockType.IN_JAIL_OR_JUST_VISITING, index, status)
 
 class FreeParkingBlock(Block):
-    def __init__(self, name, index, jackpot, status = BlockStatus.ENABLED):
-        super(Block).__init__(name, BlockType.FREE_PARKING, index, status)
+    def __init__(self, image: pygame.Surface, name, index, jackpot, status = BlockStatus.ENABLED):
+        super(Block).__init__(image, name, BlockType.FREE_PARKING, index, status)
         self.jackpot = jackpot
 
 class ImprisonBlock(Block):
-    def __init__(self, name, index, status = BlockStatus.ENABLED):
-        super(Block).__init__(name, BlockType.IMPRISON, index, status)
+    def __init__(self, image: pygame.Surface, name, index, status = BlockStatus.ENABLED):
+        super(Block).__init__(image, name, BlockType.IMPRISON, index, status)
 

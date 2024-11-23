@@ -9,8 +9,9 @@ screen = pygame.display.set_mode((1280, 720))
 clock = pygame.time.Clock()
 running = True
 
+sean = Player("Sean Cheng", 0, 0, [], 25000)
 action_menu = ActionMenuWindow((1280, 720))
-
+action_menu.updateWidtthPlayer(sean)
 
 while running:
     # poll for events
@@ -20,7 +21,7 @@ while running:
             running = False
     
     screen.fill("purple")
-    
+    action_menu.renderToScreen(screen)
     
     pygame.display.flip()
 
