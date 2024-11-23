@@ -1,8 +1,6 @@
 # Example file showing a basic pygame "game loop"
 import pygame
-from game_board import *
-from subwindows import *
-from font_machine import *
+from game import *
 
 # pygame setup
 pygame.init()
@@ -10,25 +8,22 @@ screen = pygame.display.set_mode((1280, 720))
 clock = pygame.time.Clock()
 running = True
 
-sean = Player("Sean Cheng", 0, 0, [], 25000)
-action_menu = ActionMenuWindow((1280, 720))
-action_menu.updateWidtthPlayer(sean)
-
-classic = generateClassicGameBoard()
-
+players = [
+    Player("Alice", 0, balance = 25000), 
+    Player("Bob", 0, balance = 25000),  
+    Player("Sean", 0, balance = 25000),  
+    Player("Andrew", 0, balance = 25000)
+]
+game = Game((1280, 720), generateClassicGameBoard(), players)
 
 while running:
-    # poll for events
-    # pygame.QUIT event means the user clicked X to close your window
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
     
-    classic.renderToScreen(screen)    
-    action_menu.renderToScreen(screen)
-    
+    game.renderToScreen(screen)
     pygame.display.flip()
 
-    clock.tick(60)  # limits FPS to 60
+    clock.tick(60)
 
 pygame.quit()

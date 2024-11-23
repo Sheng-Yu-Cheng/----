@@ -61,53 +61,53 @@ class StreetBlock(PropertyBlock):
 
 class RailroadBlock(PropertyBlock):
     def __init__(self, image: pygame.Surface, name, index, purchase_price, mortagate_price, rent_chart, owner = None, status = BlockStatus.ENABLED | BlockStatus.UNOWNED | BlockStatus.UNMORTGAGED):
-        super(PropertyBlock).__init__(image, name, BlockType.RAILROAD, index, purchase_price, mortagate_price, rent_chart, owner, status, image)
+        super().__init__(image, name, BlockType.RAILROAD, index, purchase_price, mortagate_price, rent_chart, owner, status, image)
 
 class UtilityBlock(PropertyBlock):
     def __init__(self, image: pygame.Surface, name, index, purchase_price, mortagate_price, rent_chart, owner = None, status = BlockStatus.ENABLED | BlockStatus.UNOWNED | BlockStatus.UNMORTGAGED):
-        super(PropertyBlock).__init__(image, name, BlockType.UTILITY, index, purchase_price, mortagate_price, rent_chart, owner, status, image)
+        super().__init__(image, name, BlockType.UTILITY, index, purchase_price, mortagate_price, rent_chart, owner, status, image)
 
 class EventBlock(Block):
     def __init__(self, image: pygame.Surface, name, type, index, deck, status):
-        super(Block).__init__(image, name, type, index, status, image)
+        super().__init__(image, name, type, index, status, image)
         self.deck = deck
 
 class ChanceBlock(EventBlock):
     def __init__(self, image: pygame.Surface, name, index, chance_card_deck, status = BlockStatus.ENABLED):
-        super(EventBlock).__init__(image, name, BlockType.CHANCE, index, chance_card_deck, status)
+        super().__init__(image, name, BlockType.CHANCE, index, chance_card_deck, status)
 
 class CommunityChestBlock(EventBlock):
     def __init__(self, image: pygame.Surface, name, index, community_chest_deck, status = BlockStatus.ENABLED):
-        super(EventBlock).__init__(image, name, BlockType.COMMUNITY_CHEST, index, community_chest_deck, status)
+        super().__init__(image, name, BlockType.COMMUNITY_CHEST, index, community_chest_deck, status)
 
 class TaxBlock(Block):
     def __init__(self, image: pygame.Surface, name, type, index, tax, status):
-        super(Block).__init__(image, name, type, index, status)
+        super().__init__(image, name, type, index, status)
         self.tax = tax
 
 class LuxuryTaxBlock(TaxBlock):
     def __init__(self, image: pygame.Surface, name, index, luxury_tax, status = BlockStatus.ENABLED):
-        super(TaxBlock).__init__(image, name, BlockType.LUXURY_TAX, index, luxury_tax, status)
+        super().__init__(image, name, BlockType.LUXURY_TAX, index, luxury_tax, status)
 
 class IncomeTaxBlock(TaxBlock):
     def __init__(self, image: pygame.Surface, name, index, income_tax, status = BlockStatus.ENABLED):
-        super(TaxBlock).__init__(image, name, BlockType.INCOME_TAX, index, income_tax, status)
+        super().__init__(image, name, BlockType.INCOME_TAX, index, income_tax, status)
 
 class StartBlock(Block):
     def __init__(self, image: pygame.Surface, name, index, salary, status = BlockStatus.ENABLED):
-        super(Block).__init__(image, name, BlockType.START, index, status)
+        super().__init__(image, name, BlockType.START, index, status)
         self.salary = salary
 
 class InJailOrJustVisitingBlock(Block):
     def __init__(self, image: pygame.Surface, name, index, status = BlockStatus.ENABLED):
-        super(Block).__init__(image, name, BlockType.IN_JAIL_OR_JUST_VISITING, index, status)
+        super().__init__(image, name, BlockType.IN_JAIL_OR_JUST_VISITING, index, status)
 
 class FreeParkingBlock(Block):
     def __init__(self, image: pygame.Surface, name, index, jackpot, status = BlockStatus.ENABLED):
-        super(Block).__init__(image, name, BlockType.FREE_PARKING, index, status)
+        super().__init__(image, name, BlockType.FREE_PARKING, index, status)
         self.jackpot = jackpot
 
 class ImprisonBlock(Block):
     def __init__(self, image: pygame.Surface, name, index, status = BlockStatus.ENABLED):
-        super(Block).__init__(image, name, BlockType.IMPRISON, index, status)
+        super().__init__(image, name, BlockType.IMPRISON, index, status)
 

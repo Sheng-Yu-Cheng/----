@@ -20,7 +20,7 @@ class ActionMenuWindow:
         self.player_name_rect.topleft = (int(self.screen_width * 0.6), 0)
         self.player_balance_rect = self.player_balance.get_rect()
         self.player_balance_rect.topleft = (int(self.screen_width * 0.6), 20)
-    def updateWidtthPlayer(self, player: Player):
+    def updateWithPlayer(self, player: Player):
         self.player_name = COMIC_SANS18.render(f'Name: {player.name}', 1, "#333333")
         self.player_balance = COMIC_SANS18.render(f'Balance: {player.balance}', 1, "#333333")
         self.player_name_rect = self.player_name.get_rect()
