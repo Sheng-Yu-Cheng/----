@@ -2,21 +2,16 @@ from block import *
 from player import *
 from game_board import *
 from subsections import *
+from game_status import *
 from typing import List, Union, Callable
 
-class GameStatus:
-    GENERAL = 0
-    SELLING = 1
-    MORTGAGING = 2
-
-
 class Game:
-    def __init__(self, screen_size, board: GameBoard, players: List[Player], status = GameStatus.GENERAL):
+    def __init__(self, screen_size, board: GameBoard, players: List[Player], status = GameStatus.ROLLING_DICE):
         self.screen_width, self.screen_height = screen_size
         self.board = board
         self.block_amount = len(self.board.blocks)
         self.player_amount = len(players)
-        self.players = players
+        self.players: List[Player] = players
         self.action_menu = ActionMenuWindow(screen_size)
         self.block_information = BlockInformation(screen_size)
         self.status = status
@@ -34,7 +29,7 @@ class Game:
         self.block_information.renderToScreen(screen)
     def generateCollideRectAndFunctionList(self):
         rect_and_func: List[Tuple[pygame.Rect, Callable]] = []
-        if self.status == GameStatus.GENERAL:
+        if self.status == GameStatus.ROLLING_DICE:
             for block in self.board.blocks:
                 def selectionFunction(): 
                     self.block_on_selection = block.index
@@ -58,6 +53,12 @@ class Game:
                 if block.index != self.previous_showing_block_info_index:
                     self.block_information.updateToBlock(block)
                 break
+    def sellSelectedBlocks(self):
+        pass
+    def mortagageSelectedBlocks(self):
+        pass
+    def buyNowBlock(self):
+        pass
     def debug(self):
         print("Block stats: ", end = '')
         for block in self.board.blocks:
