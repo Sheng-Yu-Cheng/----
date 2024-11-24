@@ -19,7 +19,6 @@ game.now_player_index = 0
 game.board.blocks[1].owner = 0
 game.board.blocks[3].owner = 0
 game.board.blocks[5].owner = 0
-
 block_collide_list = game.generateCollideRectAndFunctionList()
 
 while running:
@@ -30,6 +29,7 @@ while running:
             for rect, func in block_collide_list:
                 if rect.collidepoint(event.pos):
                     func()
+    game.handleBlockInformationShowing(pygame.mouse.get_pos())
     game.renderToScreen(screen)
     pygame.display.flip()
 
