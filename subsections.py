@@ -68,15 +68,18 @@ class BlockInformation:
         self.block_owner_rect.topleft = (int(self.screen_width * 0.6), int(self.screen_height / 2) + 20)
         #
         self.additional_information : List[Tuple[pygame.Surface, pygame.Rect]] = []
-    def updateToBlock(self, block: BLOCK):
+    def updateToBlock(self, block: BLOCK, player_list: List[Player]):
         self.block_name = COMIC_SANS18.render(block.name, 1, "#000000")
         self.additional_information = []
         if block.type == BlockType.STREET:
-            self.block_owner = COMIC_SANS18.render(f"Owner: {block.owner}", 1, "#000000")
+            owner = player_list[block.owner].name if block.owner != None else None
+            self.block_owner = COMIC_SANS18.render(f"Owner: {owner}", 1, "#000000")
         elif block.type == BlockType.RAILROAD:
-            self.block_owner = COMIC_SANS18.render(f"Owner: {block.owner}", 1, "#000000")
+            owner = player_list[block.owner].name if block.owner != None else None
+            self.block_owner = COMIC_SANS18.render(f"Owner: {owner}", 1, "#000000")
         elif block.type == BlockType.UTILITY:
-            self.block_owner = COMIC_SANS18.render(f"Owner: {block.owner}", 1, "#000000")
+            owner = player_list[block.owner].name if block.owner != None else None
+            self.block_owner = COMIC_SANS18.render(f"Owner: {owner}", 1, "#000000")
         else:
             self.block_owner = COMIC_SANS18.render("", 1, "#000000")
     def renderToScreen(self, screen: pygame.Surface):

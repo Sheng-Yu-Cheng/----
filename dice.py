@@ -15,17 +15,11 @@ class Dice:
         self.dice_result = (6, 6)
         #
         self.roll_dice_button = COMIC_SANS18.render("-ROLL DICE-", 1, "#FFFFFF", "#000000")
-        self.roll_dice_button_rect = self.roll_dice_button
+        self.roll_dice_button_rect = self.roll_dice_button.get_rect()
+        self.roll_dice_button_rect.topleft = (200, 260)
     def rollDice(self):
         self.dice_result = (random.randint(1, 6), random.randint(1, 6))
     def renderToScreen(self, screen: pygame.Surface):
         screen.blit(self.dice_images[self.dice_result[0] - 1], self.dice_rect[0])
         screen.blit(self.dice_images[self.dice_result[1] - 1], self.dice_rect[1])
-
-
-
-def rollOneDie():
-    return random.randint(1, 6)
-
-def rollTwoDice():
-    return (random.randint(1, 6), random.randint(1, 6))
+        screen.blit(self.roll_dice_button, self.roll_dice_button_rect)

@@ -14,7 +14,7 @@ players = [
     Player("Sean", 0, balance = 25000),  
     Player("Andrew", 0, balance = 25000)
 ]
-game = Game((1280, 720), generateClassicGameBoard(), players, GameStatus.SELLING)
+game = Game((1280, 720), generateClassicGameBoard(), players, GameStatus.ROLLING_DICE)
 game.now_player_index = 0
 game.board.blocks[1].owner = 0
 game.board.blocks[3].owner = 0

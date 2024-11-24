@@ -3,6 +3,7 @@ from player import *
 from game_board import *
 from subsections import *
 from game_status import *
+from dice import *
 from typing import List, Union, Callable
 
 class Game:
@@ -14,8 +15,10 @@ class Game:
         self.players: List[Player] = players
         self.action_menu = ActionMenuWindow(screen_size)
         self.block_information = BlockInformation(screen_size)
-        self.status = status
         #
+        self.dice = Dice()
+        #
+        self.status = status
         self.now_player_index = 0
         self.block_on_selection = -1
         self.previous_showing_block_info_index = -1
@@ -27,13 +30,11 @@ class Game:
         self.action_menu.renderToScreen(screen, self.status)
         self.board.renderToScreen(screen)
         self.block_information.renderToScreen(screen)
+        self.dice.renderToScreen(screen)
     def generateCollideRectAndFunctionList(self):
         rect_and_func: List[Tuple[pygame.Rect, Callable]] = []
         if self.status == GameStatus.ROLLING_DICE:
-            for block in self.board.blocks:
-                def selectionFunction(): 
-                    self.block_on_selection = block.index
-                rect_and_func.append((block.rect, selectionFunction))
+            rect_and_func.append((self.dice.roll_dice_button_rect, self.dice.rollDice))
         elif self.status == GameStatus.SELLING or self.status == GameStatus.MORTGAGING:
             for block in self.board.blocks:
                 if not isinstance(block, (StreetBlock, RailroadBlock, UtilityBlock)) or block.owner != self.now_player_index:
@@ -51,7 +52,7 @@ class Game:
         for block in self.board.blocks:
             if block.rect.collidepoint(mouse_position):
                 if block.index != self.previous_showing_block_info_index:
-                    self.block_information.updateToBlock(block)
+                    self.block_information.updateToBlock(block, self.players)
                 break
     def sellSelectedBlocks(self):
         pass
