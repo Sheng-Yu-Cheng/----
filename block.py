@@ -49,6 +49,7 @@ class Block:
         self.selected_mask.fill((255, 255, 0, 100))
         self.selected_mask_rect = self.selected_mask.get_rect()
         self.selected_mask_rect.topleft = self.rect.topleft
+
 class PropertyBlock(Block):
     def __init__(self, image: pygame.Surface, name, type, index, purchase_price, mortagate_price, rent_chart, owner, status):
         super().__init__(image, name, type, index, status)

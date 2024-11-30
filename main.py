@@ -14,7 +14,7 @@ players = [
     Player("Sean", 0, balance = 25000),  
     Player("Andrew", 0, balance = 25000)
 ]
-game = Game((1280, 720), generateClassicGameBoard(), players, GameStatus.ROLLING_DICE)
+game = Game((1280, 720), generateClassicGameBoard(), players, GameStatus.WAIT_FOR_ROLLING_DICE)
 game.now_player_index = 0
 game.board.blocks[1].owner = 0
 game.board.blocks[3].owner = 0
@@ -26,9 +26,13 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            for rect, func in block_collide_list:
+            for rect, trigger in block_collide_list:
                 if rect.collidepoint(event.pos):
-                    func()
+                    print(rect)
+                    trigger()
+    if game.status_changed:
+        block_collide_list = game.generateCollideRectAndFunctionList()
+        game.status_changed = False
     game.handleBlockInformationShowing(pygame.mouse.get_pos())
     game.renderToScreen(screen)
     pygame.display.flip()
