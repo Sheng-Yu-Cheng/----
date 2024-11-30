@@ -1,3 +1,6 @@
+# TODO: mortgaging system
+
+
 # Example file showing a basic pygame "game loop"
 import pygame
 from game import *
@@ -28,7 +31,6 @@ while running:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             for rect, trigger in block_collide_list:
                 if rect.collidepoint(event.pos):
-                    print(rect)
                     trigger()
     if game.status_changed:
         block_collide_list = game.generateCollideRectAndFunctionList()

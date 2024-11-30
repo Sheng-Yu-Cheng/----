@@ -27,9 +27,10 @@ class Game:
         self.block_on_selection = -1
         self.previous_showing_block_info_index = -1
     def playerGoAhead(self, player_index, steps):
-        self.players[player_index].position += steps
-        self.players[player_index].position %= self.block_amount
-        return self.blocks[self.players[player_index].position]
+        now_player = self.players[player_index]
+        now_player.position += steps
+        now_player.position %= self.block_amount
+        return self.board.blocks[now_player.position]
     def renderToScreen(self, screen: pygame.Surface):
         self.action_menu.renderToScreen(screen, self.status)
         self.board.renderToScreen(screen)
@@ -41,18 +42,20 @@ class Game:
         rect_and_func: List[Tuple[pygame.Rect, Callable]] = []
         if self.status == GameStatus.WAIT_FOR_ROLLING_DICE:
             rect_and_func.append((self.dice.roll_dice_button_rect, self.startRollDice))
+        elif self.status == GameStatus.WAIT_FOR_TRANSACTIONS:
+            rect_and_func.append()
         elif self.status == GameStatus.SELLING or self.status == GameStatus.MORTGAGING:
             for block in self.board.blocks:
                 if not isinstance(block, (StreetBlock, RailroadBlock, UtilityBlock)) or block.owner != self.now_player_index:
                     block.status &= 0b1110
                     continue
                 block.status |= 0b0001
-                def generator(blk):
-                    def func():
-                        self.block_on_selection = blk.index
-                        blk.status ^= BlockStatus.SELECTED
-                    return func
-                rect_and_func.append((block.rect, generator(block)))
+                def trigger_generator(_block: BLOCK):
+                    def trigger():
+                        self.block_on_selection = _block.index
+                        _block.status ^= BlockStatus.SELECTED
+                    return trigger
+                rect_and_func.append((block.rect, trigger_generator(block)))
         return rect_and_func
     def handleBlockInformationShowing(self, mouse_position):
         for block in self.board.blocks:
@@ -70,7 +73,8 @@ class Game:
         if self.dice_rolling_counter % 10 == 0:
                 self.dice.rollDice()
         if self.dice_rolling_counter == 100:
-            self.status = GameStatus.PLAYER_MAKING_MOVE
+            self.playerGoAhead(self.now_player_index, sum(self.dice.dice_result))
+            self.status = GameStatus.WAIT_FOR_TRANSACTIONS
             self.status_changed = True
         self.dice_rolling_counter += 1
     def sellSelectedBlocks(self):
@@ -82,7 +86,9 @@ class Game:
                 block.owner = None
                 #
                 block.status ^= BlockStatus.SELECTED
+                block.status ^= BlockStatus.OWNED
     def mortagageSelectedBlocks(self):
+        # TODO:
         for block in self.board.blocks:
             if block.status & BlockStatus.SELECTED:
                 owner: Player = self.players[block.owner]
@@ -93,7 +99,14 @@ class Game:
                 block.status ^= BlockStatus.SELECTED
                 block.status ^= BlockStatus.UNMORTGAGED
     def buyNowBlock(self):
-        pass
+        now_player = self.players[self.now_player_index]
+        now_block = self.board.blocks[now_player.position]
+        if not isinstance(now_block, PROPERTY_BLCOK):
+            return
+        if now_player.balance >= now_block.purchase_price:
+            now_player.balance -= now_block.purchase_price
+            now_block.owner = now_player.index
+            now_block.status |= BlockStatus.OWNED
     def debug(self):
         print("Block stats: ", end = '')
         for block in self.board.blocks:
