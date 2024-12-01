@@ -13,15 +13,12 @@ running = True
 
 players = [
     Player("Alice", 0, balance = 25000), 
-    Player("Bob", 0, balance = 25000),  
-    Player("Sean", 0, balance = 25000),  
-    Player("Andrew", 0, balance = 25000)
+    Player("Bob", 1, balance = 25000), 
+    Player("Sean", 2, balance = 25000), 
+    Player("Andrew", 3, balance = 25000)
 ]
 game = Game((1280, 720), generateClassicGameBoard(), players, GameStatus.WAIT_FOR_ROLLING_DICE)
 game.now_player_index = 0
-game.board.blocks[1].owner = 0
-game.board.blocks[3].owner = 0
-game.board.blocks[5].owner = 0
 block_collide_list = game.generateCollideRectAndFunctionList()
 
 while running:

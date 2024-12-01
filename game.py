@@ -43,8 +43,17 @@ class Game:
         if self.status == GameStatus.WAIT_FOR_ROLLING_DICE:
             rect_and_func.append((self.dice.roll_dice_button_rect, self.startRollDice))
         elif self.status == GameStatus.WAIT_FOR_TRANSACTIONS:
-            rect_and_func.append()
+            rect_and_func.append((self.action_menu.buy_button_rect, self.buyNowBlock))
+            rect_and_func.append((self.action_menu.sell_button_rect, self.startSelling))
+            rect_and_func.append((self.action_menu.mortagage_button_rect, self.startMortgaging))
+            rect_and_func.append((self.action_menu.end_round_button_rect, self.endRound))
         elif self.status == GameStatus.SELLING or self.status == GameStatus.MORTGAGING:
+            if self.status == GameStatus.SELLING:
+                rect_and_func.append((self.action_menu.confirm_button_rect, self.sellSelectedBlocks))
+                rect_and_func.append((self.action_menu.cancel_button_rect, self.cancelSelectionAndReturnToTransaction))
+            else:
+                rect_and_func.append((self.action_menu.confirm_button_rect, self.mortagageSelectedBlocks))
+                rect_and_func.append((self.action_menu.cancel_button_rect, self.cancelSelectionAndReturnToTransaction))
             for block in self.board.blocks:
                 if not isinstance(block, (StreetBlock, RailroadBlock, UtilityBlock)) or block.owner != self.now_player_index:
                     block.status &= 0b1110
@@ -57,6 +66,11 @@ class Game:
                     return trigger
                 rect_and_func.append((block.rect, trigger_generator(block)))
         return rect_and_func
+    def endRound(self):
+        self.now_player_index = (self.now_player_index + 1) % self.player_amount
+        self.action_menu.updateWithPlayer(self.players[self.now_player_index])
+        self.status = GameStatus.WAIT_FOR_ROLLING_DICE
+        self.status_changed = True
     def handleBlockInformationShowing(self, mouse_position):
         for block in self.board.blocks:
             if block.rect.collidepoint(mouse_position):
@@ -77,6 +91,9 @@ class Game:
             self.status = GameStatus.WAIT_FOR_TRANSACTIONS
             self.status_changed = True
         self.dice_rolling_counter += 1
+    def startSelling(self):
+        self.status = GameStatus.SELLING
+        self.status_changed = True
     def sellSelectedBlocks(self):
         for block in self.board.blocks:
             if block.status & BlockStatus.SELECTED:
@@ -87,6 +104,10 @@ class Game:
                 #
                 block.status ^= BlockStatus.SELECTED
                 block.status ^= BlockStatus.OWNED
+        self.cancelSelectionAndReturnToTransaction()
+    def startMortgaging(self):
+        self.status = GameStatus.MORTGAGING
+        self.status_changed = True
     def mortagageSelectedBlocks(self):
         # TODO:
         for block in self.board.blocks:
@@ -98,6 +119,7 @@ class Game:
                 #
                 block.status ^= BlockStatus.SELECTED
                 block.status ^= BlockStatus.UNMORTGAGED
+        self.cancelSelectionAndReturnToTransaction()
     def buyNowBlock(self):
         now_player = self.players[self.now_player_index]
         now_block = self.board.blocks[now_player.position]
@@ -107,6 +129,14 @@ class Game:
             now_player.balance -= now_block.purchase_price
             now_block.owner = now_player.index
             now_block.status |= BlockStatus.OWNED
+    def cancelSelectionAndReturnToTransaction(self):
+        self.status = GameStatus.WAIT_FOR_TRANSACTIONS
+        self.status_changed = True
+        for block in self.board.blocks:
+            if not block.status & BlockStatus.ENABLED:
+                block.status ^= BlockStatus.ENABLED
+            if block.status & BlockStatus.SELECTED:
+                block.status ^= BlockStatus.SELECTED
     def debug(self):
         print("Block stats: ", end = '')
         for block in self.board.blocks:

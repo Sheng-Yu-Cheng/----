@@ -11,5 +11,5 @@ class Player:
         self.position = position
         self.status = status
         self.balance = balance
-    def goto(self, position):
-        self.position = position
+
+
