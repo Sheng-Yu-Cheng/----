@@ -5,17 +5,26 @@ from subsections import *
 from game_status import *
 from dice import *
 from constant import *
+from utilities import *
 from typing import List, Union, Callable
+
 
 class Game:
     def __init__(self, screen_size, board: GameBoard, players: List[Player], status = GameStatus.WAIT_FOR_ROLLING_DICE):
         self.screen_width, self.screen_height = screen_size
+        #
         self.board = board
         self.block_amount = len(self.board.blocks)
+        self.block_on_selection = -1
+        #
         self.player_amount = len(players)
         self.players: List[Player] = players
+        self.now_player_index = 0
+        self.player_token_moving_counter = 0
+        #
         self.action_menu = ActionMenuWindow(screen_size)
         self.block_information = BlockInformation(screen_size)
+        self.previous_showing_block_info_index = -1
         #
         self.dice = Dice()
         self.dice_rolling_counter = 0
@@ -23,9 +32,6 @@ class Game:
         self.status = status
         self.status_changed = False
         #
-        self.now_player_index = 0
-        self.block_on_selection = -1
-        self.previous_showing_block_info_index = -1
     def playerGoAhead(self, player_index, steps):
         now_player = self.players[player_index]
         now_player.position += steps
@@ -37,6 +43,10 @@ class Game:
         self.block_information.renderToScreen(screen)
         if self.status == GameStatus.ROLLING_DICE:
             self.updateDiceStatus()
+        elif self.status == GameStatus.WALK_PLAYER_TOKEN:
+            self.updatePlayerToken()
+        for player in self.players:
+            player.renderToScreen(screen)
         self.dice.renderToScreen(screen)
     def generateCollideRectAndFunctionList(self):
         rect_and_func: List[Tuple[pygame.Rect, Callable]] = []
@@ -85,12 +95,35 @@ class Game:
     # this function will make the dice rolling, it will be called upon each frame
     def updateDiceStatus(self):
         if self.dice_rolling_counter % 10 == 0:
-                self.dice.rollDice()
-        if self.dice_rolling_counter == 100:
-            self.playerGoAhead(self.now_player_index, sum(self.dice.dice_result))
-            self.status = GameStatus.WAIT_FOR_TRANSACTIONS
-            self.status_changed = True
+            self.dice.rollDice()
+            if self.dice_rolling_counter == 100:
+                self.playerGoAhead(self.now_player_index, sum(self.dice.dice_result))
+                self.startWalkPlayerToken()
         self.dice_rolling_counter += 1
+    def startWalkPlayerToken(self):
+        self.status = GameStatus.WALK_PLAYER_TOKEN
+        self.status_changed = True
+        self.player_token_moving_counter = 0
+    def updatePlayerToken(self):
+        if self.player_token_moving_counter % 10 == 0:
+            now_player = self.players[self.now_player_index]
+            now_player.token_position += 1
+            #
+            now_block = self.board.blocks[now_player.token_position]
+            now_player.token.rect.topleft = addCoordinates(now_block.rect.center, TOKEN_OFFSET[now_player.index])
+            #
+            if now_player.position == now_player.token_position:
+                self.startTransactionState()
+        self.player_token_moving_counter += 1
+    def startTransactionState(self):
+        self.status = GameStatus.WAIT_FOR_TRANSACTIONS
+        self.status_changed = True
+        now_player = self.players[self.now_player_index]
+        now_block = self.board.blocks[now_player.position]
+        self.action_menu.buy_button_disabled = not (
+            isinstance(now_block, PROPERTY_BLCOK) and 
+            (now_block.owner == self.now_player_index or now_block.owner == None)
+        )
     def startSelling(self):
         self.status = GameStatus.SELLING
         self.status_changed = True
@@ -104,6 +137,7 @@ class Game:
                 #
                 block.status ^= BlockStatus.SELECTED
                 block.status ^= BlockStatus.OWNED
+        self.action_menu.updateWithPlayer(self.players[self.now_player_index])
         self.cancelSelectionAndReturnToTransaction()
     def startMortgaging(self):
         self.status = GameStatus.MORTGAGING
@@ -119,6 +153,7 @@ class Game:
                 #
                 block.status ^= BlockStatus.SELECTED
                 block.status ^= BlockStatus.UNMORTGAGED
+        self.action_menu.updateWithPlayer(self.players[self.now_player_index])
         self.cancelSelectionAndReturnToTransaction()
     def buyNowBlock(self):
         now_player = self.players[self.now_player_index]
@@ -129,6 +164,8 @@ class Game:
             now_player.balance -= now_block.purchase_price
             now_block.owner = now_player.index
             now_block.status |= BlockStatus.OWNED
+            self.action_menu.buy_button_disabled = True
+        self.action_menu.updateWithPlayer(self.players[self.now_player_index])
     def cancelSelectionAndReturnToTransaction(self):
         self.status = GameStatus.WAIT_FOR_TRANSACTIONS
         self.status_changed = True

@@ -11,6 +11,9 @@ class GameBoard:
     def renderToScreen(self, screen: pygame.Surface):
         for block in self.blocks:
             screen.blit(block.image, block.rect)
+            if isinstance(block, PROPERTY_BLCOK):
+                if (owner := block.owner) != None:
+                    screen.blit(block.owner_masks[owner], block.owner_mask_rects[owner])
             if not block.status & BlockStatus.ENABLED:
                 screen.blit(block.disabled_mask, block.disabled_mask_rect)
             elif block.status & BlockStatus.SELECTED:

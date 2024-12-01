@@ -11,11 +11,17 @@ screen = pygame.display.set_mode((1280, 720))
 clock = pygame.time.Clock()
 running = True
 
+player_token = [
+    PlayerToken(pygame.image.load("Assets/Player/pink.png")), 
+    PlayerToken(pygame.image.load("Assets/Player/orange.png")), 
+    PlayerToken(pygame.image.load("Assets/Player/green.png")), 
+    PlayerToken(pygame.image.load("Assets/Player/blue.png"))
+]
 players = [
-    Player("Alice", 0, balance = 25000), 
-    Player("Bob", 1, balance = 25000), 
-    Player("Sean", 2, balance = 25000), 
-    Player("Andrew", 3, balance = 25000)
+    Player("Alice", 0, player_token[0], balance = 25000), 
+    Player("Bob", 1, player_token[1], balance = 25000), 
+    Player("Sean", 2, player_token[2], balance = 25000), 
+    Player("Andrew", 3, player_token[3], balance = 25000)
 ]
 game = Game((1280, 720), generateClassicGameBoard(), players, GameStatus.WAIT_FOR_ROLLING_DICE)
 game.now_player_index = 0

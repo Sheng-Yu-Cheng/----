@@ -40,6 +40,11 @@ class ActionMenuWindow:
         self.confirm_button_rect.topleft = (int(self.screen_width * 0.6), 40)
         self.cancel_button_rect = self.cancel_button.get_rect()
         self.cancel_button_rect.topleft = (self.confirm_button_rect.left + self.confirm_button_rect.width + 5, 40)
+        #
+        self.buy_button_disabled = True
+        self.buy_button_disable_mask = pygame.Surface((self.buy_button_rect.width, self.buy_button_rect.height), pygame.SRCALPHA)
+        self.buy_button_disable_mask.fill((0, 0, 0, 150))
+        # TODO:
     def updateWithPlayer(self, player: Player):
         self.player_name = COMIC_SANS18.render(f'Name: {player.name}', 1, "#000000")
         self.player_balance = COMIC_SANS18.render(f'Balance: {player.balance}', 1, "#000000")
@@ -55,6 +60,8 @@ class ActionMenuWindow:
             screen.blit(self.sell_button, self.sell_button_rect)
             screen.blit(self.mortagage_button, self.mortagage_button_rect)
             screen.blit(self.buy_button, self.buy_button_rect)
+            if self.buy_button_disabled:
+                screen.blit(self.buy_button_disable_mask, self.buy_button_rect)
             screen.blit(self.end_round_button, self.end_round_button_rect)
         elif game_status == GameStatus.SELLING or game_status == GameStatus.MORTGAGING:
             screen.blit(self.confirm_button, self.confirm_button_rect)
