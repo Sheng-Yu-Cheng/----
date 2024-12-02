@@ -108,6 +108,7 @@ class Game:
         if self.player_token_moving_counter % 10 == 0:
             now_player = self.players[self.now_player_index]
             now_player.token_position += 1
+            now_player.token_position %= self.block_amount
             #
             now_block = self.board.blocks[now_player.token_position]
             now_player.token.rect.topleft = addCoordinates(now_block.rect.center, TOKEN_OFFSET[now_player.index])
