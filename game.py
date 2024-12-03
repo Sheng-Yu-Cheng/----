@@ -78,6 +78,9 @@ class Game:
         return rect_and_func
     def endRound(self):
         self.now_player_index = (self.now_player_index + 1) % self.player_amount
+        while self.players[self.now_player_index].stop_round != 0:
+            self.players[self.now_player_index].stop_round -= 1
+            self.now_player_index = (self.now_player_index + 1) % self.player_amount
         self.action_menu.updateWithPlayer(self.players[self.now_player_index])
         self.status = GameStatus.WAIT_FOR_ROLLING_DICE
         self.status_changed = True
@@ -116,7 +119,11 @@ class Game:
             now_player.token.rect.topleft = addCoordinates(now_block.rect.center, TOKEN_OFFSET[now_player.index])
             #
             if now_player.position == now_player.token_position:
-                self.startTransactionState()
+                if self.board.blocks[now_player.position].type == BlockType.IMPRISON:
+                    now_player.position = now_player.token_position = self.board.prison_block_index
+                    now_player.stop_round == 3
+                else:
+                    self.startTransactionState()
         self.player_token_moving_counter += 1
     def startTransactionState(self):
         self.status = GameStatus.WAIT_FOR_TRANSACTIONS

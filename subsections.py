@@ -117,11 +117,28 @@ class BlockInformation:
         elif isinstance(block, RailroadBlock):
             owner = player_list[block.owner].name if block.owner != None else None
             self.block_owner = COMIC_SANS18.render(f"Owner: {owner}", 1, "#000000")
+            self.block_purchase_price_label = HUNINN18.render(f"SP", 1, "#000000")
+            self.block_purchase_price = HUNINN18.render(f"{str(block.purchase_price)}", 1, "#000000")
+            self.block_rent_label = HUNINN18.render(f"1S---2S---3S---4S---", 1, "#000000")
+            chart = block.rent_chart
+            self.block_rent = HUNINN18.render(f"{str(chart[0]).ljust(5, '-')}{str(chart[1]).ljust(5, '-')}{str(chart[2]).ljust(5, '-')}{str(chart[3]).ljust(5, '-')}", 1, "#000000")
+            self.block_mortgage_price = COMIC_SANS18.render(f"Mortgage Price: {block.mortagate_price}", 1, "#000000")
         elif isinstance(block, UtilityBlock):
             owner = player_list[block.owner].name if block.owner != None else None
             self.block_owner = COMIC_SANS18.render(f"Owner: {owner}", 1, "#000000")
+            self.block_purchase_price_label = HUNINN18.render(f"SP", 1, "#000000")
+            self.block_purchase_price = HUNINN18.render(f"{str(block.purchase_price)}", 1, "#000000")
+            self.block_rent_label = HUNINN18.render(f"1U---2U---", 1, "#000000")
+            chart = block.rent_chart
+            self.block_rent = HUNINN18.render(f"{str(chart[0]).ljust(5, '-')}{str(chart[1]).ljust(5, '-')}", 1, "#000000")
+            self.block_mortgage_price = COMIC_SANS18.render(f"Mortgage Price: {block.mortagate_price}", 1, "#000000")
         else:
             self.block_owner = COMIC_SANS18.render("", 1, "#000000")
+            self.block_purchase_price_label = COMIC_SANS18.render("", 1, "#000000")
+            self.block_purchase_price = COMIC_SANS18.render("", 1, "#000000")
+            self.block_rent_label = COMIC_SANS18.render("", 1, "#000000")
+            self.block_rent = COMIC_SANS18.render("", 1, "#000000")
+            self.block_mortgage_price = COMIC_SANS18.render("", 1, "#000000")
     def renderToScreen(self, screen: pygame.Surface):
         screen.blit(self.window, self.window_rect)
         screen.blit(self.block_name, self.block_name_rect)

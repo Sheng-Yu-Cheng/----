@@ -6,8 +6,11 @@ import pygame
 class GameBoard:
     def __init__(self):
         self.blocks : List[BLOCK] = []
+        self.prison_block_index: int = None
     def addBlock(self, block: BLOCK):
         self.blocks.append(block)
+        if block.type == BlockType.IN_JAIL_OR_JUST_VISITING:
+            self.prison_block_index = block.index
     def renderToScreen(self, screen: pygame.Surface):
         for block in self.blocks:
             screen.blit(block.image, block.rect)

@@ -18,6 +18,8 @@ class Player:
         self.status = status
         self.balance = balance
         #
+        self.stop_round = 0
+        #
         self.token = token
         self.token_position = position
     def renderToScreen(self, screen: pygame.Surface):
