@@ -82,17 +82,42 @@ class BlockInformation:
         self.block_owner_rect = self.block_owner.get_rect()
         self.block_owner_rect.topleft = (int(self.screen_width * 0.6), int(self.screen_height / 2) + 20)
         #
-        self.additional_information : List[Tuple[pygame.Surface, pygame.Rect]] = []
+        self.block_purchase_price_label = COMIC_SANS18.render("", 1, "#000000")
+        self.block_purchase_price_label_rect = self.block_purchase_price_label.get_rect()
+        self.block_purchase_price_label_rect.topleft = (int(self.screen_width * 0.6), int(self.screen_height / 2) + 40)
+        #
+        self.block_purchase_price = COMIC_SANS18.render("", 1, "#000000")
+        self.block_purchase_price_rect = self.block_purchase_price.get_rect()
+        self.block_purchase_price_rect.topleft = (int(self.screen_width * 0.6), int(self.screen_height / 2) + 60)
+        #
+        self.block_rent_label = COMIC_SANS18.render("", 1, "#000000")
+        self.block_rent_label_rect = self.block_rent_label.get_rect()
+        self.block_rent_label_rect.topleft = (int(self.screen_width * 0.6), int(self.screen_height / 2) + 80)
+        #
+        self.block_rent = COMIC_SANS18.render("", 1, "#000000")
+        self.block_rent_rect = self.block_rent.get_rect()
+        self.block_rent_rect.topleft = (int(self.screen_width * 0.6), int(self.screen_height / 2) + 100)
+        #
+        self.block_mortgage_price = COMIC_SANS18.render("", 1, "#000000")
+        self.block_mortgage_price_rect = self.block_mortgage_price.get_rect()
+        self.block_mortgage_price_rect.topleft = (int(self.screen_width * 0.6), int(self.screen_height / 2) + 120)
     def updateToBlock(self, block: BLOCK, player_list: List[Player]):
         self.block_name = COMIC_SANS18.render(block.name, 1, "#000000")
         self.additional_information = []
-        if block.type == BlockType.STREET:
+        if isinstance(block, StreetBlock):
             owner = player_list[block.owner].name if block.owner != None else None
             self.block_owner = COMIC_SANS18.render(f"Owner: {owner}", 1, "#000000")
-        elif block.type == BlockType.RAILROAD:
+            self.block_purchase_price_label = HUNINN18.render(f"SP---1H---2H---3H---4H---5H---", 1, "#000000")
+            chart = block.house_price_chart
+            self.block_purchase_price = HUNINN18.render(f"{str(block.purchase_price).ljust(5, '-')}{str(chart[0]).ljust(5, '-')}{str(chart[1]).ljust(5, '-')}{str(chart[2]).ljust(5, '-')}{str(chart[3]).ljust(5, '-')}{str(chart[4]).ljust(5, '-')}", 1, "#000000")
+            self.block_rent_label = HUNINN18.render(f"SP---1H---2H---3H---4H---5H---", 1, "#000000")
+            chart = block.rent_chart
+            self.block_rent = HUNINN18.render(f"{str(chart[0]).ljust(5, '-')}{str(chart[1]).ljust(5, '-')}{str(chart[2]).ljust(5, '-')}{str(chart[3]).ljust(5, '-')}{str(chart[4]).ljust(5, '-')}{str(chart[5]).ljust(5, '-')}", 1, "#000000")
+            self.block_mortgage_price = COMIC_SANS18.render(f"Mortgage Price: {block.mortagate_price}", 1, "#000000")
+        elif isinstance(block, RailroadBlock):
             owner = player_list[block.owner].name if block.owner != None else None
             self.block_owner = COMIC_SANS18.render(f"Owner: {owner}", 1, "#000000")
-        elif block.type == BlockType.UTILITY:
+        elif isinstance(block, UtilityBlock):
             owner = player_list[block.owner].name if block.owner != None else None
             self.block_owner = COMIC_SANS18.render(f"Owner: {owner}", 1, "#000000")
         else:
@@ -101,3 +126,8 @@ class BlockInformation:
         screen.blit(self.window, self.window_rect)
         screen.blit(self.block_name, self.block_name_rect)
         screen.blit(self.block_owner, self.block_owner_rect)
+        screen.blit(self.block_rent, self.block_rent_rect)
+        screen.blit(self.block_rent_label, self.block_rent_label_rect)
+        screen.blit(self.block_purchase_price, self.block_purchase_price_rect)
+        screen.blit(self.block_purchase_price_label, self.block_purchase_price_label_rect)
+        screen.blit(self.block_mortgage_price, self.block_mortgage_price_rect)

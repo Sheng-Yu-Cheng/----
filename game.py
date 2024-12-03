@@ -152,6 +152,7 @@ class Game:
                         possessed_utility_amount += 1
                 now_player.balance -= now_block.rent_chart[possessed_utility_amount - 1]
                 self.players[now_block.owner].balance += now_block.rent_chart[possessed_utility_amount - 1]
+        self.action_menu.updateWithPlayer(now_player)
     def startSelling(self):
         self.status = GameStatus.SELLING
         self.status_changed = True
