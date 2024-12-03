@@ -108,6 +108,8 @@ class Game:
         if self.player_token_moving_counter % 10 == 0:
             now_player = self.players[self.now_player_index]
             now_player.token_position += 1
+            if now_player.position == self.block_amount:
+                now_player += self.board.blocks[0].salary
             now_player.token_position %= self.block_amount
             #
             now_block = self.board.blocks[now_player.token_position]
@@ -121,10 +123,35 @@ class Game:
         self.status_changed = True
         now_player = self.players[self.now_player_index]
         now_block = self.board.blocks[now_player.position]
-        self.action_menu.buy_button_disabled = not (
-            isinstance(now_block, PROPERTY_BLCOK) and 
-            (now_block.owner == self.now_player_index or now_block.owner == None)
-        )
+        if isinstance(now_block, StreetBlock):
+            if now_block.owner == None or (now_block.owner == now_player.index and now_block.house_amount < 5):
+                self.action_menu.buy_button_disabled = False
+            elif now_block.owner != now_player.index:
+                self.action_menu.buy_button_disabled = True
+                now_player.balance -= now_block.rent_chart[now_block.house_amount]
+                self.players[now_block.owner].balance += now_block.rent_chart[now_block.house_amount]
+        elif isinstance(now_block, RailroadBlock):
+            if now_block.owner == None:
+                self.action_menu.buy_button_disabled = False
+            elif now_block.owner != now_player.index:
+                self.action_menu.buy_button_disabled = True
+                possessed_railroad_amount = 0
+                for block in self.board.blocks:
+                    if isinstance(block, RailroadBlock) and block.owner == now_block.owner:
+                        possessed_railroad_amount += 1
+                now_player.balance -= now_block.rent_chart[possessed_railroad_amount - 1]
+                self.players[now_block.owner].balance += now_block.rent_chart[possessed_railroad_amount - 1]
+        elif isinstance(now_block, UtilityBlock):
+            if now_block.owner == None:
+                self.action_menu.buy_button_disabled = False
+            elif now_block.owner != now_player.index:
+                self.action_menu.buy_button_disabled = True
+                possessed_utility_amount = 0
+                for block in self.board.blocks:
+                    if isinstance(block, UtilityBlock) and block.owner == now_block.owner:
+                        possessed_utility_amount += 1
+                now_player.balance -= now_block.rent_chart[possessed_utility_amount - 1]
+                self.players[now_block.owner].balance += now_block.rent_chart[possessed_utility_amount - 1]
     def startSelling(self):
         self.status = GameStatus.SELLING
         self.status_changed = True
@@ -161,7 +188,11 @@ class Game:
         now_block = self.board.blocks[now_player.position]
         if not isinstance(now_block, PROPERTY_BLCOK):
             return
-        if now_player.balance >= now_block.purchase_price:
+        if now_block.status & BlockStatus.OWNED:
+            if now_block.house_amount < 5 and now_player.balance >= now_block.house_price_chart[now_block.house_amount]:
+                now_player.balance -= now_block.house_price_chart[now_block.house_amount]
+                now_block.house_amount += 1
+        elif now_player.balance >= now_block.purchase_price:
             now_player.balance -= now_block.purchase_price
             now_block.owner = now_player.index
             now_block.status |= BlockStatus.OWNED
