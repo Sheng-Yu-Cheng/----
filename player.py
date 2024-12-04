@@ -22,6 +22,7 @@ class Player:
         #
         self.token = token
         self.token_position = position
+        self.bought_this_round = False
     def renderToScreen(self, screen: pygame.Surface):
         screen.blit(self.token.image, self.token.rect)
 

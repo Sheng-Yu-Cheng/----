@@ -20,7 +20,7 @@ class ActionMenuWindow:
         self.buy_button = COMIC_SANS18.render("-BUY-", 1, "#000000", "#00FF00")
         self.confirm_button = COMIC_SANS18.render("-CONFIRM-", 1, "#000000", "#00FF00")
         self.cancel_button = COMIC_SANS18.render("-CANCEL-", 1, "#000000", "#FF0000")
-        self.end_round_button = COMIC_SANS18.render("-END ROUNG-", 1, "#000000", "#FF0000")
+        self.end_round_button = COMIC_SANS18.render("-END ROUND-", 1, "#000000", "#FF0000")
         # surface position handling
         self.window_rect = self.window.get_rect()
         self.window_rect.topleft = (int(self.screen_width * 0.6), 0)
@@ -148,3 +148,22 @@ class BlockInformation:
         screen.blit(self.block_purchase_price, self.block_purchase_price_rect)
         screen.blit(self.block_purchase_price_label, self.block_purchase_price_label_rect)
         screen.blit(self.block_mortgage_price, self.block_mortgage_price_rect)
+
+class BoardCenter:
+    def __init__(self, board_center_image: pygame.Surface, board_center_rect: pygame.Rect, block_icon_topleft: tuple[int], block_icons: list[tuple[pygame.Surface]]):
+        self.window = pygame.transform.scale(board_center_image, (board_center_rect.width, board_center_rect.height))
+        self.window_rect = board_center_rect
+        # Onselect Block 
+        self.block_icon_topleft: tuple[int] = block_icon_topleft
+        self.block_icons: List[pygame.Surface] = block_icons
+        self.onselect_block: int = None
+    def updateSelection(self, block_index: int):
+        if block_index == None:
+            self.onselect_block = None
+        else:
+            self.onselect_block = self.block_icons[block_index]
+    def renderToScreen(self, screen: pygame.Surface):
+        screen.blit(self.window, self.window_rect)
+        if self.onselect_block != None:
+            screen.blit(self.onselect_block, self.block_icon_topleft)
+        

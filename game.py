@@ -10,7 +10,12 @@ from typing import List, Union, Callable
 
 
 class Game:
-    def __init__(self, screen_size, board: GameBoard, players: List[Player], status = GameStatus.WAIT_FOR_ROLLING_DICE):
+    def __init__(self, 
+            screen_size, 
+            board: GameBoard, 
+            players: List[Player], 
+            status = GameStatus.WAIT_FOR_ROLLING_DICE
+        ):
         self.screen_width, self.screen_height = screen_size
         #
         self.board = board
@@ -24,6 +29,7 @@ class Game:
         #
         self.action_menu = ActionMenuWindow(screen_size)
         self.block_information = BlockInformation(screen_size)
+        self.board_center = BoardCenter(pygame.image.load("Assets/action menu/white.png"), pygame.Rect(100, 100, 540, 540), (150, 300), [pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/Default.png"), (300, 400))] * self.block_amount)
         self.previous_showing_block_info_index = -1
         #
         self.dice = Dice()
@@ -47,8 +53,9 @@ class Game:
             self.updatePlayerToken()
         for player in self.players:
             player.renderToScreen(screen)
+        self.board_center.renderToScreen(screen)
         self.dice.renderToScreen(screen)
-    def generateCollideRectAndFunctionList(self):
+    def generateCollideRectAndFunctionList(self, block_selection_method: callable = None):
         rect_and_func: List[Tuple[pygame.Rect, Callable]] = []
         if self.status == GameStatus.WAIT_FOR_ROLLING_DICE:
             rect_and_func.append((self.dice.roll_dice_button_rect, self.startRollDice))
@@ -75,6 +82,18 @@ class Game:
                         _block.status ^= BlockStatus.SELECTED
                     return trigger
                 rect_and_func.append((block.rect, trigger_generator(block)))
+        elif self.status == GameStatus.PROP_TARGET_SELECTION:
+            for block in self.board.blocks:
+                if not block_selection_method(block, self.board.blocks, self.now_player_index, self.players):
+                    block.status &= 0b1110
+                    continue
+                block.status |= 0b0001
+                def trigger_generator(_block: BLOCK):
+                    def trigger():
+                        self.block_on_selection = _block.index
+                        _block.status ^= BlockStatus.SELECTED
+                    return trigger
+                rect_and_func.append((block.rect, trigger_generator(block)))
         return rect_and_func
     def endRound(self):
         self.now_player_index = (self.now_player_index + 1) % self.player_amount
@@ -85,11 +104,17 @@ class Game:
         self.status = GameStatus.WAIT_FOR_ROLLING_DICE
         self.status_changed = True
     def handleBlockInformationShowing(self, mouse_position):
+        target = None
         for block in self.board.blocks:
             if block.rect.collidepoint(mouse_position):
                 if block.index != self.previous_showing_block_info_index:
-                    self.block_information.updateToBlock(block, self.players)
+                    target = block
                 break
+        if target == None:
+            self.board_center.updateSelection(None)
+        else:
+            self.block_information.updateToBlock(target, self.players)
+            self.board_center.updateSelection(target.index)
     # roll dice button react function
     def startRollDice(self):
         self.status = GameStatus.ROLLING_DICE
@@ -130,6 +155,7 @@ class Game:
         self.status_changed = True
         now_player = self.players[self.now_player_index]
         now_block = self.board.blocks[now_player.position]
+        now_player.bought_this_round = False
         if isinstance(now_block, StreetBlock):
             if now_block.owner == None or (now_block.owner == now_player.index and now_block.house_amount < 5):
                 self.action_menu.buy_button_disabled = False
@@ -194,17 +220,20 @@ class Game:
     def buyNowBlock(self):
         now_player = self.players[self.now_player_index]
         now_block = self.board.blocks[now_player.position]
-        if not isinstance(now_block, PROPERTY_BLCOK):
+        if now_player.bought_this_round or not isinstance(now_block, PROPERTY_BLCOK):
             return
-        if now_block.status & BlockStatus.OWNED:
+        # FIXME:
+        if now_block.status & BlockStatus.OWNED and now_block.owner == self.now_player_index:
             if now_block.house_amount < 5 and now_player.balance >= now_block.house_price_chart[now_block.house_amount]:
                 now_player.balance -= now_block.house_price_chart[now_block.house_amount]
                 now_block.house_amount += 1
+                now_player.bought_this_round = True
         elif now_player.balance >= now_block.purchase_price:
             now_player.balance -= now_block.purchase_price
             now_block.owner = now_player.index
             now_block.status |= BlockStatus.OWNED
             self.action_menu.buy_button_disabled = True
+            now_player.bought_this_round = True
         self.action_menu.updateWithPlayer(self.players[self.now_player_index])
     def cancelSelectionAndReturnToTransaction(self):
         self.status = GameStatus.WAIT_FOR_TRANSACTIONS

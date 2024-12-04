@@ -1,4 +1,4 @@
-# TODO: mortgaging system
+# TODO: delete smortgaging system
 
 
 # Example file showing a basic pygame "game loop"
