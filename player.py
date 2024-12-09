@@ -2,22 +2,25 @@ from stock import *
 import pygame
 from typing import List
 
-class PlayerStatus:
-    NOT_IN_JAIL = 0b0
-    IN_JAIL = 0b1
-
 class PlayerToken:
     def __init__(self, image: pygame.Surface):
         self.image: pygame.Surface = image
         self.rect: pygame.Rect = image.get_rect()
 
 class Player:
-    def __init__(self, name, index, token: PlayerToken, position = 0, balance = 0, status = PlayerStatus.NOT_IN_JAIL):
+    def __init__(self, 
+            name: str, 
+            index: int, 
+            token: PlayerToken,
+            stock_account: StockMarketAccount,  
+            position: int = 0, 
+            balance = 0
+        ):
         self.name = name
         self.index = index
         self.position = position
-        self.status = status
         self.balance = balance
+        self.stock_account: StockMarketAccount = stock_account
         #
         self.stop_round = 0
         #

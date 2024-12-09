@@ -14,8 +14,9 @@ class Game:
             screen_size, 
             board: GameBoard, 
             players: List[Player], 
-            stock_market: Market, 
-            status = GameStatus.WAIT_FOR_ROLLING_DICE
+            action_menu_background_image: pygame.Surface, 
+            stock_market: StockMarket, 
+            stock_transaction_background_image: pygame.Surface
         ):
         self.screen_width, self.screen_height = screen_size
         #
@@ -28,16 +29,16 @@ class Game:
         self.now_player_index = 0
         self.player_token_moving_counter = 0
         #
-        self.action_menu = ActionMenuWindow(screen_size)
+        self.action_menu = ActionMenuWindow(screen_size, action_menu_background_image)
         self.block_information = BlockInformation(screen_size)
-        self.stock_transactions = StockTransactions(screen_size, stock_market)
+        self.stock_transactions = StockTransactions(screen_size, stock_transaction_background_image, stock_market)
         self.board_center = BoardCenter(pygame.image.load("Assets/action menu/white.png"), pygame.Rect(100, 100, 540, 540), (150, 300), [pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/raw/Default.png"), (300, 400))] * self.block_amount)
         self.previous_showing_block_info_index = -1
         #
         self.dice = Dice()
         self.dice_rolling_counter = 0
         #
-        self.status = status
+        self.status = GameStatus.WAIT_FOR_ROLLING_DICE
         self.status_changed = False
         #
     def playerGoAhead(self, player_index, steps):
@@ -74,9 +75,9 @@ class Game:
                 rect_and_func.append((self.action_menu.cancel_button_rect, self.cancelSelectionAndReturnToTransaction))
             for block in self.board.blocks:
                 if not isinstance(block, (StreetBlock, RailroadBlock, UtilityBlock)) or block.owner != self.now_player_index:
-                    block.status &= 0b1110
+                    block.status &= 0b110
                     continue
-                block.status |= 0b0001
+                block.status |= 0b001
                 def trigger_generator(_block: BLOCK):
                     def trigger():
                         self.block_on_selection = _block.index
@@ -86,9 +87,9 @@ class Game:
         elif self.status == GameStatus.PROP_TARGET_SELECTION:
             for block in self.board.blocks:
                 if not block_selection_method(block, self.board, self.now_player_index, self.players):
-                    block.status &= 0b1110
+                    block.status &= 0b110
                     continue
-                block.status |= 0b0001
+                block.status |= 0b001
                 def trigger_generator(_block: BLOCK):
                     def trigger():
                         self.block_on_selection = _block.index

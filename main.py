@@ -1,11 +1,6 @@
-# TODO: delete smortgaging system
-
-
-# Example file showing a basic pygame "game loop"
 import pygame
 from game import *
 
-# pygame setup
 pygame.init()
 screen = pygame.display.set_mode((1280, 720))
 clock = pygame.time.Clock()
@@ -17,23 +12,25 @@ player_token = [
     PlayerToken(pygame.image.load("Assets/Player/green.png")), 
     PlayerToken(pygame.image.load("Assets/Player/blue.png"))
 ]
-players = [
-    Player("Alice", 0, player_token[0], balance = 25000), 
-    Player("Bob", 1, player_token[1], balance = 25000), 
-    Player("Sean", 2, player_token[2], balance = 25000), 
-    Player("Andrew", 3, player_token[3], balance = 25000)
-]
-market = Market([
+market = StockMarket([
     Stock("TSMC", "0"), 
     Stock("Foxconn", "0"), 
     Stock("Delta", "0")
 ])
+players = [
+    Player("Alice", 0, player_token[0], StockMarketAccount(market), balance = 25000), 
+    Player("Bob", 1, player_token[1], StockMarketAccount(market), balance = 25000), 
+    Player("Sean", 2, player_token[2], StockMarketAccount(market), balance = 25000), 
+    Player("Andrew", 3, player_token[3], StockMarketAccount(market), balance = 25000)
+]
 game = Game(
     (1280, 720), 
     generateClassicGameBoard(), 
     players, 
+    pygame.image.load("Assets/TaiwanBoard/Backgrounds/ActionMenu.png"), 
     market, 
-    GameStatus.WAIT_FOR_ROLLING_DICE)
+    pygame.image.load("Assets/TaiwanBoard/raw/white.png")
+)
 game.now_player_index = 0
 block_collide_list = game.generateCollideRectAndReactFunctionList()
 

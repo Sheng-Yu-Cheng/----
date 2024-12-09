@@ -9,9 +9,9 @@ from stock import *
 import pygame
 
 class ActionMenuWindow:
-    def __init__(self, screen_size):
+    def __init__(self, screen_size, background_image: pygame.Surface):
         self.screen_width, self.screen_height = screen_size
-        self.window = pygame.transform.scale(pygame.image.load("Assets/action menu/white.png"), (int(self.screen_width * 0.4), int(self.screen_height / 2)))
+        self.window = pygame.transform.scale(background_image, (int(self.screen_width * 0.4), int(self.screen_height / 2)))
         # player information
         self.player_name = COMIC_SANS18.render("Name: ", 1, "#000000")
         self.player_balance = COMIC_SANS18.render("Balance: ", 1, "#000000")
@@ -157,25 +157,24 @@ class BoardCenter:
             screen.blit(self.onselect_block, self.block_icon_topleft)
 
 class StockTransactions:
-    def __init__(self, screen_size, market: Market):
+    def __init__(self, screen_size, background_image: pygame.Surface, market: StockMarket):
         self.screen_width, self.screen_height = screen_size
-        self.window = pygame.transform.scale(pygame.image.load("Assets/action menu/white.png"), (int(self.screen_width * 0.4), int(self.screen_height / 4 * 3)))
+        self.window = pygame.transform.scale(background_image, (int(self.screen_width * 0.4), int(self.screen_height / 4 * 3)))
         self.window_rect = self.window.get_rect()
         self.window_rect.topleft = (int(self.screen_width * 0.6), int(self.screen_height / 4))
         #
-        self.market: Market = market
+        self.market: StockMarket = market
         self.labels = [
             (COMIC_SANS18.render("Market Value", 1, "#000000"), (5, 5)), 
             (COMIC_SANS18.render("stock", 1, "#000000"), (5, 100)), 
             (COMIC_SANS18.render("value", 1, "#000000"), (105, 100)), 
-            (COMIC_SANS18.render("owned", 1, "#000000"), (205, 100)), 
-            (COMIC_SANS18.render("Transaction on each stock will charge 100 dollars", 1, "#FF0000"), (5, 120 + 20 * self.market.stock_amount))
+            (COMIC_SANS18.render("owned", 1, "#000000"), (205, 100))
         ]
         self.prices = []
         self.owned = []
         self.add_buttons = []
         self.minus_buttons = []
-        for i, stock_name in enumerate(self.market.market):
+        for i, stock_name in enumerate(self.market.stocks):
             y = 120 + i * 20
             self.labels.append((COMIC_SANS18.render(stock_name, 1, "#000000"), (5, y)))
             self.prices.append([COMIC_SANS18.render("0", 1, "#000000"), addCoordinates((105, y), self.window_rect.topleft)])
@@ -184,7 +183,7 @@ class StockTransactions:
             self.minus_buttons.append([COMIC_SANS18.render(" - ", 1, "#000000", "#FF0000"), addCoordinates((325, y), self.window_rect.topleft)])
         for label, topleft in self.labels:
             self.window.blit(label, topleft)
-        
+        #
     def renderToScreen(self, screen: pygame.Surface):
         screen.blit(self.window, self.window_rect)
         for price, rect in self.prices:
@@ -195,13 +194,26 @@ class StockTransactions:
             screen.blit(button, rect)
         for button, rect in self.minus_buttons:
             screen.blit(button, rect)    
-    def updateToBuyer(self, buyer: Buyer):
+    def updateToPlayer(self, player: Player):
         # TODO
         pass
     def getCollideRectAndReactFunctionList(self, now_player: Player):
         rect_and_func = []
-        for add, rect in self.add_buttons:
-            def trigger_generator(stock_name):
-                def trigger():
-                    now_player.buyer
-            rect_and_func.append(rect, )
+        def add_button_trigger_generator(stock_name):
+            def trigger():
+                if now_player.balance >= now_player.stock_account.stock_market.stocks[stock_name].value:
+                    now_player.stock_account.stocks[stock_name] += 1
+                    now_player.balance -= now_player.stock_account.stock_market.stocks[stock_name].value
+            return trigger
+        def minus_button_trigger_generator(stock_name):
+            def trigger():
+                if now_player.stock_account.stocks[stock_name] > 0:
+                    now_player.stock_account.stocks[stock_name] -= 1
+                    now_player.balance == now_player.stock_account.stock_market.stocks[stock_name].value
+            return trigger
+        for i, stock_name in enumerate(self.market.stocks):
+            add, rect = self.add_buttons[i]
+            rect_and_func.append(rect, add_button_trigger_generator(stock_name))
+            minus, rect = self.minus_buttons[i]
+            rect_and_func.append(rect, minus_button_trigger_generator(stock_name))
+        return rect_and_func
