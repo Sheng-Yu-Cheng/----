@@ -17,7 +17,6 @@ class ActionMenuWindow:
         self.player_balance = COMIC_SANS18.render("Balance: ", 1, "#000000")
         # buttons
         self.sell_button = COMIC_SANS18.render("-SELL-", 1, "#000000", "#FFFF00")
-        self.mortagage_button = COMIC_SANS18.render("-MORTAGAGE-", 1, "#000000", "#FFFF00")
         self.buy_button = COMIC_SANS18.render("-BUY-", 1, "#000000", "#00FF00")
         self.confirm_button = COMIC_SANS18.render("-CONFIRM-", 1, "#000000", "#00FF00")
         self.cancel_button = COMIC_SANS18.render("-CANCEL-", 1, "#000000", "#FF0000")
@@ -31,10 +30,8 @@ class ActionMenuWindow:
         self.player_balance_rect.topleft = (int(self.screen_width * 0.6), 20)
         self.sell_button_rect = self.sell_button.get_rect()
         self.sell_button_rect.topleft = (int(self.screen_width * 0.6), 40)
-        self.mortagage_button_rect = self.mortagage_button.get_rect()
-        self.mortagage_button_rect.topleft = (self.sell_button_rect.left + self.sell_button_rect.width + 5, 40)
         self.buy_button_rect = self.buy_button.get_rect()
-        self.buy_button_rect.topleft = (self.mortagage_button_rect.left + self.mortagage_button_rect.width + 5, 40)
+        self.buy_button_rect.topleft = (self.sell_button_rect.left + self.sell_button_rect.width + 5, 40)
         self.end_round_button_rect = self.end_round_button.get_rect()
         self.end_round_button_rect.topleft = (self.buy_button_rect.left + self.buy_button_rect.width + 5, 40)
         self.confirm_button_rect = self.confirm_button.get_rect()
@@ -59,12 +56,11 @@ class ActionMenuWindow:
         screen.blit(self.player_balance, self.player_balance_rect)
         if game_status == GameStatus.WAIT_FOR_TRANSACTIONS:
             screen.blit(self.sell_button, self.sell_button_rect)
-            screen.blit(self.mortagage_button, self.mortagage_button_rect)
             screen.blit(self.buy_button, self.buy_button_rect)
             if self.buy_button_disabled:
                 screen.blit(self.buy_button_disable_mask, self.buy_button_rect)
             screen.blit(self.end_round_button, self.end_round_button_rect)
-        elif game_status == GameStatus.SELLING or game_status == GameStatus.MORTGAGING:
+        elif game_status == GameStatus.SELLING:
             screen.blit(self.confirm_button, self.confirm_button_rect)
             screen.blit(self.cancel_button, self.cancel_button_rect)
 

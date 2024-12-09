@@ -31,7 +31,7 @@ class Game:
         self.action_menu = ActionMenuWindow(screen_size)
         self.block_information = BlockInformation(screen_size)
         self.stock_transactions = StockTransactions(screen_size, stock_market)
-        self.board_center = BoardCenter(pygame.image.load("Assets/action menu/white.png"), pygame.Rect(100, 100, 540, 540), (150, 300), [pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/Default.png"), (300, 400))] * self.block_amount)
+        self.board_center = BoardCenter(pygame.image.load("Assets/action menu/white.png"), pygame.Rect(100, 100, 540, 540), (150, 300), [pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/raw/Default.png"), (300, 400))] * self.block_amount)
         self.previous_showing_block_info_index = -1
         #
         self.dice = Dice()
@@ -65,14 +65,12 @@ class Game:
         elif self.status == GameStatus.WAIT_FOR_TRANSACTIONS:
             rect_and_func.append((self.action_menu.buy_button_rect, self.buyNowBlock))
             rect_and_func.append((self.action_menu.sell_button_rect, self.startSelling))
-            rect_and_func.append((self.action_menu.mortagage_button_rect, self.startMortgaging))
             rect_and_func.append((self.action_menu.end_round_button_rect, self.endRound))
-        elif self.status == GameStatus.SELLING or self.status == GameStatus.MORTGAGING:
+        elif self.status == GameStatus.SELLING:
             if self.status == GameStatus.SELLING:
                 rect_and_func.append((self.action_menu.confirm_button_rect, self.sellSelectedBlocks))
                 rect_and_func.append((self.action_menu.cancel_button_rect, self.cancelSelectionAndReturnToTransaction))
             else:
-                rect_and_func.append((self.action_menu.confirm_button_rect, self.mortagageSelectedBlocks))
                 rect_and_func.append((self.action_menu.cancel_button_rect, self.cancelSelectionAndReturnToTransaction))
             for block in self.board.blocks:
                 if not isinstance(block, (StreetBlock, RailroadBlock, UtilityBlock)) or block.owner != self.now_player_index:
@@ -203,21 +201,6 @@ class Game:
                 #
                 block.status ^= BlockStatus.SELECTED
                 block.status ^= BlockStatus.OWNED
-        self.action_menu.updateWithPlayer(self.players[self.now_player_index])
-        self.cancelSelectionAndReturnToTransaction()
-    def startMortgaging(self):
-        self.status = GameStatus.MORTGAGING
-        self.status_changed = True
-    def mortagageSelectedBlocks(self):
-        # TODO:
-        for block in self.board.blocks:
-            if block.status & BlockStatus.SELECTED:
-                owner: Player = self.players[block.owner]
-                #
-                owner.balance += block.mortagate_price
-                block.owner = None
-                #
-                block.status ^= BlockStatus.SELECTED
         self.action_menu.updateWithPlayer(self.players[self.now_player_index])
         self.cancelSelectionAndReturnToTransaction()
     def buyNowBlock(self):
