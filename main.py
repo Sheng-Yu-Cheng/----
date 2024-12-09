@@ -23,9 +23,19 @@ players = [
     Player("Sean", 2, player_token[2], balance = 25000), 
     Player("Andrew", 3, player_token[3], balance = 25000)
 ]
-game = Game((1280, 720), generateClassicGameBoard(), players, GameStatus.WAIT_FOR_ROLLING_DICE)
+market = Market([
+    Stock("TSMC", "0"), 
+    Stock("Foxconn", "0"), 
+    Stock("Delta", "0")
+])
+game = Game(
+    (1280, 720), 
+    generateClassicGameBoard(), 
+    players, 
+    market, 
+    GameStatus.WAIT_FOR_ROLLING_DICE)
 game.now_player_index = 0
-block_collide_list = game.generateCollideRectAndFunctionList()
+block_collide_list = game.generateCollideRectAndReactFunctionList()
 
 while running:
     for event in pygame.event.get():
@@ -36,7 +46,7 @@ while running:
                 if rect.collidepoint(event.pos):
                     trigger()
     if game.status_changed:
-        block_collide_list = game.generateCollideRectAndFunctionList()
+        block_collide_list = game.generateCollideRectAndReactFunctionList()
         game.status_changed = False
     game.handleBlockInformationShowing(pygame.mouse.get_pos())
     game.renderToScreen(screen)

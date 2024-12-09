@@ -1,3 +1,4 @@
+from stock import *
 import pygame
 from typing import List
 

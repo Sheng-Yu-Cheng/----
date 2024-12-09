@@ -14,6 +14,7 @@ class Game:
             screen_size, 
             board: GameBoard, 
             players: List[Player], 
+            stock_market: Market, 
             status = GameStatus.WAIT_FOR_ROLLING_DICE
         ):
         self.screen_width, self.screen_height = screen_size
@@ -29,6 +30,7 @@ class Game:
         #
         self.action_menu = ActionMenuWindow(screen_size)
         self.block_information = BlockInformation(screen_size)
+        self.stock_transactions = StockTransactions(screen_size, stock_market)
         self.board_center = BoardCenter(pygame.image.load("Assets/action menu/white.png"), pygame.Rect(100, 100, 540, 540), (150, 300), [pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/Default.png"), (300, 400))] * self.block_amount)
         self.previous_showing_block_info_index = -1
         #
@@ -47,6 +49,7 @@ class Game:
         self.action_menu.renderToScreen(screen, self.status)
         self.board.renderToScreen(screen)
         self.block_information.renderToScreen(screen)
+        #self.stock_transactions.renderToScreen(screen)
         if self.status == GameStatus.ROLLING_DICE:
             self.updateDiceStatus()
         elif self.status == GameStatus.WALK_PLAYER_TOKEN:
@@ -55,7 +58,7 @@ class Game:
             player.renderToScreen(screen)
         self.board_center.renderToScreen(screen)
         self.dice.renderToScreen(screen)
-    def generateCollideRectAndFunctionList(self, block_selection_method: callable = None):
+    def generateCollideRectAndReactFunctionList(self, block_selection_method: callable = None):
         rect_and_func: List[Tuple[pygame.Rect, Callable]] = []
         if self.status == GameStatus.WAIT_FOR_ROLLING_DICE:
             rect_and_func.append((self.dice.roll_dice_button_rect, self.startRollDice))
@@ -84,7 +87,7 @@ class Game:
                 rect_and_func.append((block.rect, trigger_generator(block)))
         elif self.status == GameStatus.PROP_TARGET_SELECTION:
             for block in self.board.blocks:
-                if not block_selection_method(block, self.board.blocks, self.now_player_index, self.players):
+                if not block_selection_method(block, self.board, self.now_player_index, self.players):
                     block.status &= 0b1110
                     continue
                 block.status |= 0b0001
@@ -146,7 +149,8 @@ class Game:
             if now_player.position == now_player.token_position:
                 if self.board.blocks[now_player.position].type == BlockType.IMPRISON:
                     now_player.position = now_player.token_position = self.board.prison_block_index
-                    now_player.stop_round == 3
+                    now_player.stop_round = 3
+                    now_player.token.rect.topleft = addCoordinates(now_block.rect.center, TOKEN_OFFSET[now_player.index])
                 else:
                     self.startTransactionState()
         self.player_token_moving_counter += 1
@@ -214,7 +218,6 @@ class Game:
                 block.owner = None
                 #
                 block.status ^= BlockStatus.SELECTED
-                block.status ^= BlockStatus.UNMORTGAGED
         self.action_menu.updateWithPlayer(self.players[self.now_player_index])
         self.cancelSelectionAndReturnToTransaction()
     def buyNowBlock(self):

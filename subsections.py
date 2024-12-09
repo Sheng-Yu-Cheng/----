@@ -5,6 +5,7 @@ from utilities import *
 from constant import *
 from game_status import *
 from typing import List, Tuple, Union
+from stock import *
 import pygame
 
 class ActionMenuWindow:
@@ -98,9 +99,6 @@ class BlockInformation:
         self.block_rent_rect = self.block_rent.get_rect()
         self.block_rent_rect.topleft = (int(self.screen_width * 0.6), int(self.screen_height / 2) + 100)
         #
-        self.block_mortgage_price = COMIC_SANS18.render("", 1, "#000000")
-        self.block_mortgage_price_rect = self.block_mortgage_price.get_rect()
-        self.block_mortgage_price_rect.topleft = (int(self.screen_width * 0.6), int(self.screen_height / 2) + 120)
     def updateToBlock(self, block: BLOCK, player_list: List[Player]):
         self.block_name = COMIC_SANS18.render(block.name, 1, "#000000")
         self.additional_information = []
@@ -113,7 +111,6 @@ class BlockInformation:
             self.block_rent_label = HUNINN18.render(f"SP---1H---2H---3H---4H---5H---", 1, "#000000")
             chart = block.rent_chart
             self.block_rent = HUNINN18.render(f"{str(chart[0]).ljust(5, '-')}{str(chart[1]).ljust(5, '-')}{str(chart[2]).ljust(5, '-')}{str(chart[3]).ljust(5, '-')}{str(chart[4]).ljust(5, '-')}{str(chart[5]).ljust(5, '-')}", 1, "#000000")
-            self.block_mortgage_price = COMIC_SANS18.render(f"Mortgage Price: {block.mortagate_price}", 1, "#000000")
         elif isinstance(block, RailroadBlock):
             owner = player_list[block.owner].name if block.owner != None else None
             self.block_owner = COMIC_SANS18.render(f"Owner: {owner}", 1, "#000000")
@@ -122,7 +119,6 @@ class BlockInformation:
             self.block_rent_label = HUNINN18.render(f"1S---2S---3S---4S---", 1, "#000000")
             chart = block.rent_chart
             self.block_rent = HUNINN18.render(f"{str(chart[0]).ljust(5, '-')}{str(chart[1]).ljust(5, '-')}{str(chart[2]).ljust(5, '-')}{str(chart[3]).ljust(5, '-')}", 1, "#000000")
-            self.block_mortgage_price = COMIC_SANS18.render(f"Mortgage Price: {block.mortagate_price}", 1, "#000000")
         elif isinstance(block, UtilityBlock):
             owner = player_list[block.owner].name if block.owner != None else None
             self.block_owner = COMIC_SANS18.render(f"Owner: {owner}", 1, "#000000")
@@ -131,14 +127,12 @@ class BlockInformation:
             self.block_rent_label = HUNINN18.render(f"1U---2U---", 1, "#000000")
             chart = block.rent_chart
             self.block_rent = HUNINN18.render(f"{str(chart[0]).ljust(5, '-')}{str(chart[1]).ljust(5, '-')}", 1, "#000000")
-            self.block_mortgage_price = COMIC_SANS18.render(f"Mortgage Price: {block.mortagate_price}", 1, "#000000")
         else:
             self.block_owner = COMIC_SANS18.render("", 1, "#000000")
             self.block_purchase_price_label = COMIC_SANS18.render("", 1, "#000000")
             self.block_purchase_price = COMIC_SANS18.render("", 1, "#000000")
             self.block_rent_label = COMIC_SANS18.render("", 1, "#000000")
             self.block_rent = COMIC_SANS18.render("", 1, "#000000")
-            self.block_mortgage_price = COMIC_SANS18.render("", 1, "#000000")
     def renderToScreen(self, screen: pygame.Surface):
         screen.blit(self.window, self.window_rect)
         screen.blit(self.block_name, self.block_name_rect)
@@ -147,7 +141,6 @@ class BlockInformation:
         screen.blit(self.block_rent_label, self.block_rent_label_rect)
         screen.blit(self.block_purchase_price, self.block_purchase_price_rect)
         screen.blit(self.block_purchase_price_label, self.block_purchase_price_label_rect)
-        screen.blit(self.block_mortgage_price, self.block_mortgage_price_rect)
 
 class BoardCenter:
     def __init__(self, board_center_image: pygame.Surface, board_center_rect: pygame.Rect, block_icon_topleft: tuple[int], block_icons: list[tuple[pygame.Surface]]):
@@ -166,4 +159,53 @@ class BoardCenter:
         screen.blit(self.window, self.window_rect)
         if self.onselect_block != None:
             screen.blit(self.onselect_block, self.block_icon_topleft)
+
+class StockTransactions:
+    def __init__(self, screen_size, market: Market):
+        self.screen_width, self.screen_height = screen_size
+        self.window = pygame.transform.scale(pygame.image.load("Assets/action menu/white.png"), (int(self.screen_width * 0.4), int(self.screen_height / 4 * 3)))
+        self.window_rect = self.window.get_rect()
+        self.window_rect.topleft = (int(self.screen_width * 0.6), int(self.screen_height / 4))
+        #
+        self.market: Market = market
+        self.labels = [
+            (COMIC_SANS18.render("Market Value", 1, "#000000"), (5, 5)), 
+            (COMIC_SANS18.render("stock", 1, "#000000"), (5, 100)), 
+            (COMIC_SANS18.render("value", 1, "#000000"), (105, 100)), 
+            (COMIC_SANS18.render("owned", 1, "#000000"), (205, 100)), 
+            (COMIC_SANS18.render("Transaction on each stock will charge 100 dollars", 1, "#FF0000"), (5, 120 + 20 * self.market.stock_amount))
+        ]
+        self.prices = []
+        self.owned = []
+        self.add_buttons = []
+        self.minus_buttons = []
+        for i, stock_name in enumerate(self.market.market):
+            y = 120 + i * 20
+            self.labels.append((COMIC_SANS18.render(stock_name, 1, "#000000"), (5, y)))
+            self.prices.append([COMIC_SANS18.render("0", 1, "#000000"), addCoordinates((105, y), self.window_rect.topleft)])
+            self.owned.append([COMIC_SANS18.render("0", 1, "#000000"), addCoordinates((205, y), self.window_rect.topleft)])
+            self.add_buttons.append([COMIC_SANS18.render(" + ", 1, "#000000", "#00FF00"), addCoordinates((305, y), self.window_rect.topleft)])
+            self.minus_buttons.append([COMIC_SANS18.render(" - ", 1, "#000000", "#FF0000"), addCoordinates((325, y), self.window_rect.topleft)])
+        for label, topleft in self.labels:
+            self.window.blit(label, topleft)
         
+    def renderToScreen(self, screen: pygame.Surface):
+        screen.blit(self.window, self.window_rect)
+        for price, rect in self.prices:
+            screen.blit(price, rect)
+        for owned, rect in self.owned:
+            screen.blit(owned, rect)
+        for button, rect in self.add_buttons:
+            screen.blit(button, rect)
+        for button, rect in self.minus_buttons:
+            screen.blit(button, rect)    
+    def updateToBuyer(self, buyer: Buyer):
+        # TODO
+        pass
+    def getCollideRectAndReactFunctionList(self, now_player: Player):
+        rect_and_func = []
+        for add, rect in self.add_buttons:
+            def trigger_generator(stock_name):
+                def trigger():
+                    now_player.buyer
+            rect_and_func.append(rect, )
