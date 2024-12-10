@@ -69,31 +69,31 @@ class BlockInformation:
         self.screen_width, self.screen_height = screen_size
         self.window = pygame.transform.scale(pygame.image.load("Assets/action menu/white.png"), (int(self.screen_width * 0.4), int(self.screen_height / 2)))
         self.window_rect = self.window.get_rect()
-        self.window_rect.topleft = (int(self.screen_width * 0.6), int(self.screen_height / 2))
+        self.window_rect.topleft = (400, 200)
         #
         self.block_name = COMIC_SANS18.render("", 1, "#000000")
         self.block_name_rect = self.block_name.get_rect()
-        self.block_name_rect.topleft = (int(self.screen_width * 0.6), int(self.screen_height / 2))
+        self.block_name_rect.topleft = addCoordinates(self.window_rect.topleft, (5, 5))
         #
         self.block_owner = COMIC_SANS18.render("", 1, "#000000")
         self.block_owner_rect = self.block_owner.get_rect()
-        self.block_owner_rect.topleft = (int(self.screen_width * 0.6), int(self.screen_height / 2) + 20)
+        self.block_owner_rect.topleft = addCoordinates(self.window_rect.topleft, (5, 25))
         #
         self.block_purchase_price_label = COMIC_SANS18.render("", 1, "#000000")
         self.block_purchase_price_label_rect = self.block_purchase_price_label.get_rect()
-        self.block_purchase_price_label_rect.topleft = (int(self.screen_width * 0.6), int(self.screen_height / 2) + 40)
+        self.block_purchase_price_label_rect.topleft = addCoordinates(self.window_rect.topleft, (5, 45))
         #
         self.block_purchase_price = COMIC_SANS18.render("", 1, "#000000")
         self.block_purchase_price_rect = self.block_purchase_price.get_rect()
-        self.block_purchase_price_rect.topleft = (int(self.screen_width * 0.6), int(self.screen_height / 2) + 60)
+        self.block_purchase_price_rect.topleft = addCoordinates(self.window_rect.topleft, (5, 65))
         #
         self.block_rent_label = COMIC_SANS18.render("", 1, "#000000")
         self.block_rent_label_rect = self.block_rent_label.get_rect()
-        self.block_rent_label_rect.topleft = (int(self.screen_width * 0.6), int(self.screen_height / 2) + 80)
+        self.block_rent_label_rect.topleft = addCoordinates(self.window_rect.topleft, (5, 85))
         #
         self.block_rent = COMIC_SANS18.render("", 1, "#000000")
         self.block_rent_rect = self.block_rent.get_rect()
-        self.block_rent_rect.topleft = (int(self.screen_width * 0.6), int(self.screen_height / 2) + 100)
+        self.block_rent_rect.topleft = addCoordinates(self.window_rect.topleft, (5, 105))
         #
     def updateToBlock(self, block: BLOCK, player_list: List[Player]):
         self.block_name = COMIC_SANS18.render(block.name, 1, "#000000")
@@ -155,7 +155,7 @@ class BoardCenter:
         screen.blit(self.window, self.window_rect)
         if self.onselect_block != None:
             screen.blit(self.onselect_block, self.block_icon_topleft)
-
+            
 class StockTransactions:
     def __init__(self, screen_size, background_image: pygame.Surface, market: StockMarket):
         self.screen_width, self.screen_height = screen_size

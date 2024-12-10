@@ -32,7 +32,7 @@ class Game:
         self.action_menu = ActionMenuWindow(screen_size, action_menu_background_image)
         self.block_information = BlockInformation(screen_size)
         self.stock_transactions = StockTransactions(screen_size, stock_transaction_background_image, stock_market)
-        self.board_center = BoardCenter(pygame.image.load("Assets/action menu/white.png"), pygame.Rect(100, 100, 540, 540), (150, 300), [pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/raw/Default.png"), (300, 400))] * self.block_amount)
+        self.board_center = BoardCenter(pygame.image.load("Assets/action menu/white.png"), pygame.Rect(100, 100, 540, 540), (105, 200), [pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/raw/Default.png"), (300, 400))] * self.block_amount)
         self.previous_showing_block_info_index = -1
         #
         self.dice = Dice()
@@ -49,8 +49,7 @@ class Game:
     def renderToScreen(self, screen: pygame.Surface):
         self.action_menu.renderToScreen(screen, self.status)
         self.board.renderToScreen(screen)
-        self.block_information.renderToScreen(screen)
-        #self.stock_transactions.renderToScreen(screen)
+        self.stock_transactions.renderToScreen(screen)
         if self.status == GameStatus.ROLLING_DICE:
             self.updateDiceStatus()
         elif self.status == GameStatus.WALK_PLAYER_TOKEN:
@@ -58,6 +57,7 @@ class Game:
         for player in self.players:
             player.renderToScreen(screen)
         self.board_center.renderToScreen(screen)
+        self.block_information.renderToScreen(screen)
         self.dice.renderToScreen(screen)
     def generateCollideRectAndReactFunctionList(self, block_selection_method: callable = None):
         rect_and_func: List[Tuple[pygame.Rect, Callable]] = []
