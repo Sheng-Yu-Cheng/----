@@ -5,6 +5,7 @@ from utilities import *
 from constant import *
 from game_status import *
 from typing import List, Tuple, Union
+from prop import *
 from stock import *
 import pygame
 
@@ -139,7 +140,7 @@ class BlockInformation:
         screen.blit(self.block_purchase_price_label, self.block_purchase_price_label_rect)
 
 class BoardCenter:
-    def __init__(self, board_center_image: pygame.Surface, board_center_rect: pygame.Rect, block_icon_topleft: tuple[int], block_icons: list[tuple[pygame.Surface]]):
+    def __init__(self, board_center_image: pygame.Surface, board_center_rect: pygame.Rect, block_icon_topleft: tuple[int], block_icons: list[pygame.Surface]):
         self.window = pygame.transform.scale(board_center_image, (board_center_rect.width, board_center_rect.height))
         self.window_rect = board_center_rect
         # Onselect Block 
@@ -176,11 +177,26 @@ class StockTransactions:
         self.minus_buttons = []
         for i, stock_name in enumerate(self.market.stocks):
             y = 120 + i * 20
-            self.labels.append((COMIC_SANS18.render(stock_name, 1, "#000000"), (5, y)))
-            self.prices.append([COMIC_SANS18.render("0", 1, "#000000"), addCoordinates((105, y), self.window_rect.topleft)])
-            self.owned.append([COMIC_SANS18.render("0", 1, "#000000"), addCoordinates((205, y), self.window_rect.topleft)])
-            self.add_buttons.append([COMIC_SANS18.render(" + ", 1, "#000000", "#00FF00"), addCoordinates((305, y), self.window_rect.topleft)])
-            self.minus_buttons.append([COMIC_SANS18.render(" - ", 1, "#000000", "#FF0000"), addCoordinates((325, y), self.window_rect.topleft)])
+            name = COMIC_SANS18.render(stock_name, 1, "#000000")
+            name_rect = name.get_rect()
+            name_rect.topleft = (5, y)
+            self.labels.append([name, name_rect])
+            price = COMIC_SANS18.render("0", 1, "#000000")
+            price_rect = price.get_rect()
+            price_rect.topleft = addCoordinates((105, y), self.window_rect.topleft)
+            self.prices.append([price, price_rect])
+            owned = COMIC_SANS18.render("0", 1, "#000000")
+            owned_rect = owned.get_rect()
+            owned_rect.topleft = addCoordinates((205, y), self.window_rect.topleft)
+            self.owned.append([owned, owned_rect])
+            add_button = COMIC_SANS18.render(" + ", 1, "#000000", "#00FF00")
+            add_button_rect = add_button.get_rect()
+            add_button_rect.topleft = addCoordinates((305, y), self.window_rect.topleft)
+            self.add_buttons.append([add_button, add_button_rect])
+            minus_button = COMIC_SANS18.render(" - ", 1, "#000000", "#FF0000")
+            minus_button_rect = minus_button.get_rect()
+            minus_button_rect.topleft = addCoordinates((325, y), self.window_rect.topleft)
+            self.minus_buttons.append([minus_button, minus_button_rect])
         for label, topleft in self.labels:
             self.window.blit(label, topleft)
         #
@@ -195,8 +211,9 @@ class StockTransactions:
         for button, rect in self.minus_buttons:
             screen.blit(button, rect)    
     def updateToPlayer(self, player: Player):
-        # TODO
-        pass
+        for i, stock_name in enumerate(self.market.stocks):
+            self.prices[i][0] = COMIC_SANS18.render(f'{self.market.stocks[stock_name].value}', 1, "#000000")
+            self.owned[i][0] = COMIC_SANS18.render(f'{player.stock_account.stocks[stock_name]}', 1, "#000000")
     def getCollideRectAndReactFunctionList(self, now_player: Player):
         rect_and_func = []
         def add_button_trigger_generator(stock_name):
@@ -204,16 +221,37 @@ class StockTransactions:
                 if now_player.balance >= now_player.stock_account.stock_market.stocks[stock_name].value:
                     now_player.stock_account.stocks[stock_name] += 1
                     now_player.balance -= now_player.stock_account.stock_market.stocks[stock_name].value
+                    self.updateToPlayer(now_player)
             return trigger
         def minus_button_trigger_generator(stock_name):
             def trigger():
                 if now_player.stock_account.stocks[stock_name] > 0:
                     now_player.stock_account.stocks[stock_name] -= 1
-                    now_player.balance == now_player.stock_account.stock_market.stocks[stock_name].value
+                    now_player.balance += now_player.stock_account.stock_market.stocks[stock_name].value
+                    self.updateToPlayer(now_player)
             return trigger
         for i, stock_name in enumerate(self.market.stocks):
             add, rect = self.add_buttons[i]
-            rect_and_func.append(rect, add_button_trigger_generator(stock_name))
+            rect_and_func.append((rect, add_button_trigger_generator(stock_name)))
             minus, rect = self.minus_buttons[i]
-            rect_and_func.append(rect, minus_button_trigger_generator(stock_name))
+            rect_and_func.append((rect, minus_button_trigger_generator(stock_name)))
         return rect_and_func
+
+class PropsSection:
+    def __init__(self, background_image, prop_amount_limit: int):
+        self.windon_image: pygame.Surface = background_image
+        self.window_rect: pygame.Rect = self.windon_image.get_rect()
+        #
+        self.prop_amount_limit = prop_amount_limit
+        self.props_list: List[Prop] = []
+        self.props_list_topleft: List[Tuple[int]] = []
+        for i in range(0, self.prop_amount_limit):
+            self.props_list_topleft.append((self.window_rect.top + i * 40))
+    def updateToPlayer(self, player: Player):
+        self.prop_list = player.props
+        for i, prop in enumerate(self.prop_list):
+            prop.setTopleft(addCoordinates(self.window_rect, self.props_list_topleft[i]))
+    def renderToScreen(self, screen: pygame.Surface):
+        for prop in self.prop_list:
+            prop.renderToScreen(screen)
+    

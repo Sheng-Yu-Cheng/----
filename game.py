@@ -16,7 +16,8 @@ class Game:
             players: List[Player], 
             action_menu_background_image: pygame.Surface, 
             stock_market: StockMarket, 
-            stock_transaction_background_image: pygame.Surface
+            stock_transaction_background_image: pygame.Surface,
+            block_icons: List[pygame.Surface]
         ):
         self.screen_width, self.screen_height = screen_size
         #
@@ -32,7 +33,7 @@ class Game:
         self.action_menu = ActionMenuWindow(screen_size, action_menu_background_image)
         self.block_information = BlockInformation(screen_size)
         self.stock_transactions = StockTransactions(screen_size, stock_transaction_background_image, stock_market)
-        self.board_center = BoardCenter(pygame.image.load("Assets/action menu/white.png"), pygame.Rect(100, 100, 540, 540), (105, 200), [pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/raw/Default.png"), (300, 400))] * self.block_amount)
+        self.board_center = BoardCenter(pygame.image.load("Assets/action menu/white.png"), pygame.Rect(100, 100, 540, 540), (105, 200), block_icons)
         self.previous_showing_block_info_index = -1
         #
         self.dice = Dice()
@@ -61,6 +62,7 @@ class Game:
         self.dice.renderToScreen(screen)
     def generateCollideRectAndReactFunctionList(self, block_selection_method: callable = None):
         rect_and_func: List[Tuple[pygame.Rect, Callable]] = []
+        rect_and_func.extend(self.stock_transactions.getCollideRectAndReactFunctionList(self.players[self.now_player_index]))
         if self.status == GameStatus.WAIT_FOR_ROLLING_DICE:
             rect_and_func.append((self.dice.roll_dice_button_rect, self.startRollDice))
         elif self.status == GameStatus.WAIT_FOR_TRANSACTIONS:

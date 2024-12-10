@@ -1,4 +1,5 @@
 from stock import *
+from prop import *
 import pygame
 from typing import List
 
@@ -12,7 +13,8 @@ class Player:
             name: str, 
             index: int, 
             token: PlayerToken,
-            stock_account: StockMarketAccount,  
+            stock_account: StockMarketAccount, 
+            props: List[Prop],  
             position: int = 0, 
             balance = 0
         ):
@@ -21,6 +23,7 @@ class Player:
         self.position = position
         self.balance = balance
         self.stock_account: StockMarketAccount = stock_account
+        self.props: List[Prop] = props
         #
         self.stop_round = 0
         #
