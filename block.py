@@ -1,4 +1,5 @@
 import pygame
+from EventCardDeck import *
 from typing import List, Union
 
 class BlockType:
@@ -83,9 +84,9 @@ class UtilityBlock(PropertyBlock):
         super().__init__(image, name, BlockType.UTILITY, index, purchase_price, mortagate_price, rent_chart, owner, status)
 
 class EventBlock(Block):
-    def __init__(self, image: pygame.Surface, name, type, index, deck, status):
+    def __init__(self, image: pygame.Surface, name, type, index, deck: EventCardDeck, status):
         super().__init__(image, name, type, index, status)
-        self.deck = deck
+        self.deck: EventCardDeck = deck
 
 class ChanceBlock(EventBlock):
     def __init__(self, image: pygame.Surface, name, index, chance_card_deck, status = BlockStatus.ENABLED):

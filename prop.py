@@ -7,7 +7,7 @@ class Prop:
         image: pygame.Surface,
         need_selection: bool
         
-    ):
+    ): #TODO:
         self.name: str = name
         self.image: pygame.Surface = image
         self.rect: pygame.Rect = self.image.get_rect()

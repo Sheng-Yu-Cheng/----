@@ -19,8 +19,8 @@ class EventCard:
         self.selected = False
         #
         self.effect: Callable = effect
-    def doEffect(self, **kwargs):
-        self.effect(kwargs)
+    def doEffect(self, block, selected_blocks, board, now_player, players):
+        self.effect(block, selected_blocks, board, now_player, players)
     
 class EventCardDeck:
     def __init__(self, deck: List[EventCard]):
@@ -32,7 +32,7 @@ class EventCardDeck:
         self.now_card = None
     def drawCard(self):
         random_value = randint(1, self.total_weight)
-        L, R = 0, len(self.weight_prefix_sum) - 1
+        L, R = 0, len(self.deck) - 1
         while L <= R - 1:
             M = L + R >> 1
             if self.weight_prefix_sum[M] <= random_value:

@@ -40,8 +40,9 @@ class Game:
         self.dice_rolling_counter = 0
         #
         self.status = GameStatus.WAIT_FOR_ROLLING_DICE
-        self.status_changed = False
         #
+        self.collide_rect_and_react_func_list: List[Tuple[pygame.Rect, Callable]] = []
+        self.generateCollideRectAndReactFunctionList()
     def playerGoAhead(self, player_index, steps):
         now_player = self.players[player_index]
         now_player.position += steps
@@ -50,17 +51,19 @@ class Game:
     def renderToScreen(self, screen: pygame.Surface):
         self.action_menu.renderToScreen(screen, self.status)
         self.board.renderToScreen(screen)
+        for player in self.players:
+            player.renderToScreen(screen)
         self.stock_transactions.renderToScreen(screen)
+        self.board_center.renderToScreen(screen)
+        self.block_information.renderToScreen(screen)
+        self.dice.renderToScreen(screen)
         if self.status == GameStatus.ROLLING_DICE:
             self.updateDiceStatus()
         elif self.status == GameStatus.WALK_PLAYER_TOKEN:
             self.updatePlayerToken()
-        for player in self.players:
-            player.renderToScreen(screen)
-        self.board_center.renderToScreen(screen)
-        self.block_information.renderToScreen(screen)
-        self.dice.renderToScreen(screen)
-    def generateCollideRectAndReactFunctionList(self, block_selection_method: callable = None):
+        elif self.status == GameStatus.SHOWING_EVENT_CARD:
+            self.board.blocks[self.players[self.now_player_index].position].deck.renderToScreen(screen) 
+    def generateCollideRectAndReactFunctionList(self, confirm_function: Callable = None, cancel_function: Callable = None, block_selection_method: Callable = None):
         rect_and_func: List[Tuple[pygame.Rect, Callable]] = []
         rect_and_func.extend(self.stock_transactions.getCollideRectAndReactFunctionList(self.players[self.now_player_index]))
         if self.status == GameStatus.WAIT_FOR_ROLLING_DICE:
@@ -87,6 +90,8 @@ class Game:
                     return trigger
                 rect_and_func.append((block.rect, trigger_generator(block)))
         elif self.status == GameStatus.PROP_TARGET_SELECTION:
+            rect_and_func.append((self.action_menu.confirm_button_rect, confirm_function))
+            rect_and_func.append((self.action_menu.cancel_button_rect, cancel_function))
             for block in self.board.blocks:
                 if not block_selection_method(block, self.board, self.now_player_index, self.players):
                     block.status &= 0b110
@@ -98,7 +103,10 @@ class Game:
                         _block.status ^= BlockStatus.SELECTED
                     return trigger
                 rect_and_func.append((block.rect, trigger_generator(block)))
-        return rect_and_func
+
+        elif self.status == GameStatus.SHOWING_EVENT_CARD:
+            rect_and_func.append((pygame.Rect(0, 0, self.screen_width, self.screen_height), self.startExecutingEffect))
+        self.collide_rect_and_react_func_list = rect_and_func
     def endRound(self):
         self.now_player_index = (self.now_player_index + 1) % self.player_amount
         while self.players[self.now_player_index].stop_round != 0:
@@ -106,7 +114,7 @@ class Game:
             self.now_player_index = (self.now_player_index + 1) % self.player_amount
         self.action_menu.updateWithPlayer(self.players[self.now_player_index])
         self.status = GameStatus.WAIT_FOR_ROLLING_DICE
-        self.status_changed = True
+        self.generateCollideRectAndReactFunctionList()
     def handleBlockInformationShowing(self, mouse_position):
         target = None
         for block in self.board.blocks:
@@ -123,7 +131,7 @@ class Game:
     def startRollDice(self):
         self.status = GameStatus.ROLLING_DICE
         self.dice_rolling_counter = 0
-        self.status_changed = True
+        self.generateCollideRectAndReactFunctionList()
     # this function will make the dice rolling, it will be called upon each frame
     def updateDiceStatus(self):
         if self.dice_rolling_counter % 10 == 0:
@@ -134,8 +142,8 @@ class Game:
         self.dice_rolling_counter += 1
     def startWalkPlayerToken(self):
         self.status = GameStatus.WALK_PLAYER_TOKEN
-        self.status_changed = True
         self.player_token_moving_counter = 0
+        self.generateCollideRectAndReactFunctionList()
     def updatePlayerToken(self):
         if self.player_token_moving_counter % 10 == 0:
             now_player = self.players[self.now_player_index]
@@ -152,12 +160,45 @@ class Game:
                     now_player.position = now_player.token_position = self.board.prison_block_index
                     now_player.stop_round = 3
                     now_player.token.rect.topleft = addCoordinates(now_block.rect.center, TOKEN_OFFSET[now_player.index])
+                elif self.board.blocks[now_player.position].type == BlockType.CHANCE or self.board.blocks[now_player.position].type == BlockType.COMMUNITY_CHEST:
+                    now_block = self.board.blocks[now_player.position]
+                    now_block.deck.drawCard()
+                    self.startShowingEventCard()
                 else:
                     self.startTransactionState()
         self.player_token_moving_counter += 1
+    def startShowingEventCard(self):
+        self.status = GameStatus.SHOWING_EVENT_CARD
+        self.generateCollideRectAndReactFunctionList()
+    def startExecutingEffect(self):
+        now_player = self.players[self.now_player_index]
+        now_block = self.board.blocks[now_player.position]
+        now_card = now_block.deck.now_card
+        if now_card.need_selection:
+            self.status = GameStatus.PROP_TARGET_SELECTION
+            self.generateCollideRectAndReactFunctionList(self.confirmPropTargetSelection, self.cancelPropTargetSelection, now_card.target_filter)
+        else:
+            now_card.doEffect(now_block, [], self.board, now_player, self.players)
+            self.startTransactionState()
+    def confirmPropTargetSelection(self):
+        self.selected_blocks = []
+        for block in self.board.blocks:
+            if block.status & BlockStatus.SELECTED:
+                self.selected_blocks.append(block)
+                block.status ^= BlockStatus.SELECTED
+            block.status |= BlockStatus.ENABLED
+        now_player = self.players[self.now_player_index]
+        now_block = self.board.blocks[now_player.position]
+        now_card = now_block.deck.now_card
+        now_card.doEffect(now_block, [], self.board, now_player, self.players)
+        self.startTransactionState()
+    def cancelPropTargetSelection(self):
+        for block in self.board.blocks:
+            block.status |= BlockStatus.ENABLED
+        self.startTransactionState()
     def startTransactionState(self):
         self.status = GameStatus.WAIT_FOR_TRANSACTIONS
-        self.status_changed = True
+        self.generateCollideRectAndReactFunctionList()
         now_player = self.players[self.now_player_index]
         now_block = self.board.blocks[now_player.position]
         now_player.bought_this_round = False
@@ -193,7 +234,7 @@ class Game:
         self.action_menu.updateWithPlayer(now_player)
     def startSelling(self):
         self.status = GameStatus.SELLING
-        self.status_changed = True
+        self.generateCollideRectAndReactFunctionList()
     def sellSelectedBlocks(self):
         for block in self.board.blocks:
             if block.status & BlockStatus.SELECTED:
@@ -226,7 +267,7 @@ class Game:
         self.action_menu.updateWithPlayer(self.players[self.now_player_index])
     def cancelSelectionAndReturnToTransaction(self):
         self.status = GameStatus.WAIT_FOR_TRANSACTIONS
-        self.status_changed = True
+        self.generateCollideRectAndReactFunctionList()
         for block in self.board.blocks:
             if not block.status & BlockStatus.ENABLED:
                 block.status ^= BlockStatus.ENABLED
