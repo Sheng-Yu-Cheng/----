@@ -217,8 +217,7 @@ class StockTransactions:
         for label, topleft in self.labels:
             self.window.blit(label, topleft)
         #
-    def renderToScreen(self, screen: pygame.Surface, game_state):
-        print(game_state)
+    def renderToScreen(self, screen: pygame.Surface):
         screen.blit(self.window, self.window_rect)
         for price, rect in self.prices:
             screen.blit(price, rect)

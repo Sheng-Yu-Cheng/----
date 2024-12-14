@@ -40,6 +40,9 @@ class Game:
         #
         self.showing_prop_section = True
         #
+        self.selected_blocks: List[Block] = []
+        self.selected_players: List[Player] = []
+        #
         self.dice = Dice()
         self.dice_rolling_counter = 0
         #
@@ -53,7 +56,7 @@ class Game:
         if self.showing_prop_section:
             self.prop_section.renderToScreen(screen)
         else:
-            self.stock_transactions.renderToScreen(screen, self.status)
+            self.stock_transactions.renderToScreen(screen)
         self.board_center.renderToScreen(screen)
         for player in self.players:
             player.renderToScreen(screen)
@@ -69,7 +72,8 @@ class Game:
             confirm_function: Callable = lambda: False, 
             cancel_function: Callable = lambda: False, 
             block_selection_method: Callable = lambda: False,
-            player_selection_method: Callable = lambda: False
+            player_selection_method: Callable = lambda: False, 
+            prop_now_using: Prop = None
         ):
         rect_and_func: List[Tuple[pygame.Rect, Callable]] = []
         rect_and_func.append((self.action_menu.prop_button_rect, self.changeToPropSection))
@@ -136,7 +140,15 @@ class Game:
                 icon.disabled = False
                 def trigger_generator(_icon: PlayerIcon):
                     def trigger():
-                        _icon.selected = not _icon.selected
+                        if _icon.selected:
+                            _icon.selected = False
+                            self.selected_players.remove(_icon)
+                        else:
+                            _icon.selected = True
+                            self.selected_players.append(_icon)
+                            if len(self.selected_players) > prop_now_using.player_target_maximum:
+                                self.selected_players[0].selected = False
+                                self.selected_players.pop(0)
                     return trigger
                 rect_and_func.append((icon.rect, trigger_generator(icon)))
             for block in self.board.blocks:
@@ -146,8 +158,16 @@ class Game:
                 block.status |= 0b001
                 def trigger_generator(_block: BLOCK):
                     def trigger():
-                        self.block_on_selection = _block.index
-                        _block.status ^= BlockStatus.SELECTED
+                        if _block.status & BlockStatus.SELECTED:
+                            self.block_on_selection = _block.index
+                            _block.status ^= BlockStatus.SELECTED
+                            self.selected_blocks.remove(_block)
+                        else:
+                            _block.status ^= BlockStatus.SELECTED
+                            self.selected_blocks.append(_block)
+                            if len(self.selected_blocks) > prop_now_using.block_target_maximum:
+                                self.selected_blocks[0] ^= BlockStatus.SELECTED
+                                self.selected_blocks.pop(0)
                     return trigger
                 rect_and_func.append((block.rect, trigger_generator(block)))
         elif self.status == GameStatus.SHOWING_EVENT_CARD:
@@ -210,7 +230,8 @@ class Game:
             confirmFunction, 
             cancelFunction, 
             prop.block_target_filter,
-            prop.player_target_filter
+            prop.player_target_filter, 
+            prop
         )
 
     # ------------------- BLOCK INFO ---------------------
