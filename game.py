@@ -17,6 +17,7 @@ class Game:
             action_menu_background_image: pygame.Surface, 
             stock_market: StockMarket, 
             stock_transaction_background_image: pygame.Surface,
+            prop_section_background_image: pygame.Surface, 
             block_icons: List[pygame.Surface]
         ):
         self.screen_width, self.screen_height = screen_size
@@ -34,7 +35,10 @@ class Game:
         self.block_information = BlockInformation(screen_size)
         self.stock_transactions = StockTransactions(screen_size, stock_transaction_background_image, stock_market)
         self.board_center = BoardCenter(pygame.image.load("Assets/action menu/white.png"), pygame.Rect(100, 100, 540, 540), (105, 200), block_icons)
+        self.prop_section = PropsSection(screen_size, prop_section_background_image, 4)
         self.previous_showing_block_info_index = -1
+        #
+        self.showing_prop_section = True
         #
         self.dice = Dice()
         self.dice_rolling_counter = 0
@@ -43,18 +47,16 @@ class Game:
         #
         self.collide_rect_and_react_func_list: List[Tuple[pygame.Rect, Callable]] = []
         self.generateCollideRectAndReactFunctionList()
-    def playerGoAhead(self, player_index, steps):
-        now_player = self.players[player_index]
-        now_player.position += steps
-        now_player.position %= self.block_amount
-        return self.board.blocks[now_player.position]
     def renderToScreen(self, screen: pygame.Surface):
         self.action_menu.renderToScreen(screen, self.status)
         self.board.renderToScreen(screen)
+        if self.showing_prop_section:
+            self.prop_section.renderToScreen(screen)
+        else:
+            self.stock_transactions.renderToScreen(screen, self.status)
+        self.board_center.renderToScreen(screen)
         for player in self.players:
             player.renderToScreen(screen)
-        self.stock_transactions.renderToScreen(screen)
-        self.board_center.renderToScreen(screen)
         self.block_information.renderToScreen(screen)
         self.dice.renderToScreen(screen)
         if self.status == GameStatus.ROLLING_DICE:
@@ -63,15 +65,49 @@ class Game:
             self.updatePlayerToken()
         elif self.status == GameStatus.SHOWING_EVENT_CARD:
             self.board.blocks[self.players[self.now_player_index].position].deck.renderToScreen(screen) 
-    def generateCollideRectAndReactFunctionList(self, confirm_function: Callable = None, cancel_function: Callable = None, block_selection_method: Callable = None):
+    def generateCollideRectAndReactFunctionList(self, 
+            confirm_function: Callable = lambda: False, 
+            cancel_function: Callable = lambda: False, 
+            block_selection_method: Callable = lambda: False,
+            player_selection_method: Callable = lambda: False
+        ):
         rect_and_func: List[Tuple[pygame.Rect, Callable]] = []
-        rect_and_func.extend(self.stock_transactions.getCollideRectAndReactFunctionList(self.players[self.now_player_index]))
+        rect_and_func.append((self.action_menu.prop_button_rect, self.changeToPropSection))
+        rect_and_func.append((self.action_menu.stocks_button_rect, self.changeToStockSection))
+        if self.showing_prop_section:
+            pass
+        else:
+            rect_and_func.extend(self.stock_transactions.getCollideRectAndReactFunctionList(self.players[self.now_player_index]))        
         if self.status == GameStatus.WAIT_FOR_ROLLING_DICE:
             rect_and_func.append((self.dice.roll_dice_button_rect, self.startRollDice))
+            #
+            now_player = self.players[self.now_player_index]
+            for prop in now_player.props:
+                def propActivateFunctionGenerator(prop: Prop, now_game_state):
+                    def trigger():
+                        if not prop.need_block_selection and not prop.need_player_selection:
+                            self.executePropEffectAndGoBackToGameState(now_game_state)
+                            return
+                        self.startPropSelection(now_game_state, prop)                        
+                        return
+                    return trigger
+                rect_and_func.append((prop.rect, propActivateFunctionGenerator(prop, self.status)))
         elif self.status == GameStatus.WAIT_FOR_TRANSACTIONS:
             rect_and_func.append((self.action_menu.buy_button_rect, self.buyNowBlock))
             rect_and_func.append((self.action_menu.sell_button_rect, self.startSelling))
             rect_and_func.append((self.action_menu.end_round_button_rect, self.endRound))
+            #
+            now_player = self.players[self.now_player_index]
+            for prop in now_player.props:
+                def propActivateFunctionGenerator(prop: Prop, now_game_state):
+                    def trigger():
+                        if not prop.need_block_selection and not prop.need_player_selection:
+                            self.executePropEffectAndGoBackToGameState(now_game_state)
+                            return
+                        self.startPropSelection(now_game_state, prop)                        
+                        return
+                    return trigger
+                rect_and_func.append((prop.rect, propActivateFunctionGenerator(prop, self.status)))
         elif self.status == GameStatus.SELLING:
             if self.status == GameStatus.SELLING:
                 rect_and_func.append((self.action_menu.confirm_button_rect, self.sellSelectedBlocks))
@@ -92,6 +128,17 @@ class Game:
         elif self.status == GameStatus.PROP_TARGET_SELECTION:
             rect_and_func.append((self.action_menu.confirm_button_rect, confirm_function))
             rect_and_func.append((self.action_menu.cancel_button_rect, cancel_function))
+            for player in self.players:
+                icon = player.icon
+                if not player_selection_method(self.board, self.now_player_index, self.players):
+                    icon.disabled = True
+                    continue
+                icon.disabled = False
+                def trigger_generator(_icon: PlayerIcon):
+                    def trigger():
+                        _icon.selected = not _icon.selected
+                    return trigger
+                rect_and_func.append((icon.rect, trigger_generator(icon)))
             for block in self.board.blocks:
                 if not block_selection_method(block, self.board, self.now_player_index, self.players):
                     block.status &= 0b110
@@ -103,18 +150,70 @@ class Game:
                         _block.status ^= BlockStatus.SELECTED
                     return trigger
                 rect_and_func.append((block.rect, trigger_generator(block)))
-
         elif self.status == GameStatus.SHOWING_EVENT_CARD:
-            rect_and_func.append((pygame.Rect(0, 0, self.screen_width, self.screen_height), self.startExecutingEffect))
+            rect_and_func.append((pygame.Rect(0, 0, self.screen_width, self.screen_height), self.startExecutingEventCardEffect))
         self.collide_rect_and_react_func_list = rect_and_func
+    
+
+
+
+    # ------------------- END ROUND ---------------------
     def endRound(self):
         self.now_player_index = (self.now_player_index + 1) % self.player_amount
         while self.players[self.now_player_index].stop_round != 0:
             self.players[self.now_player_index].stop_round -= 1
             self.now_player_index = (self.now_player_index + 1) % self.player_amount
         self.action_menu.updateWithPlayer(self.players[self.now_player_index])
+        self.prop_section.updateToPlayer(self.players[self.now_player_index])
         self.status = GameStatus.WAIT_FOR_ROLLING_DICE
         self.generateCollideRectAndReactFunctionList()
+    
+
+    # ------------------- PROPS ------------------------
+    def executePropEffectAndGoBackToGameState(self, game_state, prop: Prop):
+        now_player = self.players[self.now_player_index]
+        now_block = self.board.blocks[now_player.index]
+        selected_blocks = []
+        for block in self.board.blocks:
+            if block.status & BlockStatus.SELECTED:
+                selected_blocks.append(block)
+                block.status ^= BlockStatus.SELECTED
+            block.status |= BlockStatus.ENABLED
+        selected_players = []
+        for player in self.players:
+            if player.icon.selected:
+                selected_players.append(player)
+                player.icon.selected = False
+            player.icon.disabled = False
+        prop.doEffect(now_block, selected_blocks, self.board, now_player, selected_players, self.players)
+        now_player.props.remove(prop)
+        self.prop_section.updateToPlayer(now_player)
+        self.status = game_state
+        self.generateCollideRectAndReactFunctionList()
+    def cancelPropActivationAndGoBackToGameState(self, game_state):
+        for block in self.board.blocks:
+            if block.status & BlockStatus.SELECTED:
+                block.status ^= BlockStatus.SELECTED
+            block.status |= BlockStatus.ENABLED
+        for player in self.players:
+            player.icon.selected = False
+            player.icon.disabled = False
+        self.status = game_state
+        self.generateCollideRectAndReactFunctionList()
+    def startPropSelection(self, game_state, prop: Prop):
+        self.status = GameStatus.PROP_TARGET_SELECTION
+        def confirmFunction():
+            self.executePropEffectAndGoBackToGameState(game_state, prop)
+        def cancelFunction():
+            self.cancelPropActivationAndGoBackToGameState(game_state)
+        self.generateCollideRectAndReactFunctionList(
+            confirmFunction, 
+            cancelFunction, 
+            prop.block_target_filter,
+            prop.player_target_filter
+        )
+
+    # ------------------- BLOCK INFO ---------------------
     def handleBlockInformationShowing(self, mouse_position):
         target = None
         for block in self.board.blocks:
@@ -127,12 +226,28 @@ class Game:
         else:
             self.block_information.updateToBlock(target, self.players)
             self.board_center.updateSelection(target.index)
-    # roll dice button react function
-    def startRollDice(self):
+    
+    
+
+
+
+    # ------------------- PROP and STOCK ACTION MENU ---------------------
+    def changeToPropSection(self):
+        self.showing_prop_section = True
+        self.generateCollideRectAndReactFunctionList()
+    def changeToStockSection(self):
+        self.showing_prop_section = False
+        self.generateCollideRectAndReactFunctionList()
+
+
+
+
+
+    # ------------------- DICE ---------------------
+    def startRollDice(self): 
         self.status = GameStatus.ROLLING_DICE
         self.dice_rolling_counter = 0
         self.generateCollideRectAndReactFunctionList()
-    # this function will make the dice rolling, it will be called upon each frame
     def updateDiceStatus(self):
         if self.dice_rolling_counter % 10 == 0:
             self.dice.rollDice()
@@ -140,10 +255,21 @@ class Game:
                 self.playerGoAhead(self.now_player_index, sum(self.dice.dice_result))
                 self.startWalkPlayerToken()
         self.dice_rolling_counter += 1
+    
+
+
+
+
+    # ------------------- PLAYER POSITION ---------------------
     def startWalkPlayerToken(self):
         self.status = GameStatus.WALK_PLAYER_TOKEN
         self.player_token_moving_counter = 0
         self.generateCollideRectAndReactFunctionList()
+    def playerGoAhead(self, player_index, steps):
+        now_player = self.players[player_index]
+        now_player.position += steps
+        now_player.position %= self.block_amount
+        return self.board.blocks[now_player.position]
     def updatePlayerToken(self):
         if self.player_token_moving_counter % 10 == 0:
             now_player = self.players[self.now_player_index]
@@ -167,20 +293,30 @@ class Game:
                 else:
                     self.startTransactionState()
         self.player_token_moving_counter += 1
+    
+
+
+
+
+    # ------------------- EVENT CARD ---------------------
     def startShowingEventCard(self):
         self.status = GameStatus.SHOWING_EVENT_CARD
         self.generateCollideRectAndReactFunctionList()
-    def startExecutingEffect(self):
+    def startExecutingEventCardEffect(self):
         now_player = self.players[self.now_player_index]
         now_block = self.board.blocks[now_player.position]
         now_card = now_block.deck.now_card
         if now_card.need_selection:
             self.status = GameStatus.PROP_TARGET_SELECTION
-            self.generateCollideRectAndReactFunctionList(self.confirmPropTargetSelection, self.cancelPropTargetSelection, now_card.target_filter)
+            self.generateCollideRectAndReactFunctionList(
+                self.confirmEventCardTargetSelection, 
+                self.cancelEventCardTargetSelection, 
+                now_card.target_filter
+            )
         else:
             now_card.doEffect(now_block, [], self.board, now_player, self.players)
             self.startTransactionState()
-    def confirmPropTargetSelection(self):
+    def confirmEventCardTargetSelection(self):
         self.selected_blocks = []
         for block in self.board.blocks:
             if block.status & BlockStatus.SELECTED:
@@ -192,10 +328,14 @@ class Game:
         now_card = now_block.deck.now_card
         now_card.doEffect(now_block, [], self.board, now_player, self.players)
         self.startTransactionState()
-    def cancelPropTargetSelection(self):
+    def cancelEventCardTargetSelection(self):
         for block in self.board.blocks:
             block.status |= BlockStatus.ENABLED
         self.startTransactionState()
+
+
+
+    # ------------------- TRANSACTION ---------------------
     def startTransactionState(self):
         self.status = GameStatus.WAIT_FOR_TRANSACTIONS
         self.generateCollideRectAndReactFunctionList()
@@ -232,6 +372,10 @@ class Game:
                 now_player.balance -= now_block.rent_chart[possessed_utility_amount - 1]
                 self.players[now_block.owner].balance += now_block.rent_chart[possessed_utility_amount - 1]
         self.action_menu.updateWithPlayer(now_player)
+    
+
+
+    # ------------------- SELLING ---------------------
     def startSelling(self):
         self.status = GameStatus.SELLING
         self.generateCollideRectAndReactFunctionList()
@@ -247,12 +391,23 @@ class Game:
                 block.status ^= BlockStatus.OWNED
         self.action_menu.updateWithPlayer(self.players[self.now_player_index])
         self.cancelSelectionAndReturnToTransaction()
+    def cancelSelectionAndReturnToTransaction(self):
+        self.status = GameStatus.WAIT_FOR_TRANSACTIONS
+        self.generateCollideRectAndReactFunctionList()
+        for block in self.board.blocks:
+            if not block.status & BlockStatus.ENABLED:
+                block.status ^= BlockStatus.ENABLED
+            if block.status & BlockStatus.SELECTED:
+                block.status ^= BlockStatus.SELECTED
+    
+
+    
+    # ------------------- BUY ---------------------
     def buyNowBlock(self):
         now_player = self.players[self.now_player_index]
         now_block = self.board.blocks[now_player.position]
         if now_player.bought_this_round or not isinstance(now_block, PROPERTY_BLCOK):
             return
-        # FIXME:
         if now_block.status & BlockStatus.OWNED and now_block.owner == self.now_player_index:
             if now_block.house_amount < 5 and now_player.balance >= now_block.house_price_chart[now_block.house_amount]:
                 now_player.balance -= now_block.house_price_chart[now_block.house_amount]
@@ -265,14 +420,6 @@ class Game:
             self.action_menu.buy_button_disabled = True
             now_player.bought_this_round = True
         self.action_menu.updateWithPlayer(self.players[self.now_player_index])
-    def cancelSelectionAndReturnToTransaction(self):
-        self.status = GameStatus.WAIT_FOR_TRANSACTIONS
-        self.generateCollideRectAndReactFunctionList()
-        for block in self.board.blocks:
-            if not block.status & BlockStatus.ENABLED:
-                block.status ^= BlockStatus.ENABLED
-            if block.status & BlockStatus.SELECTED:
-                block.status ^= BlockStatus.SELECTED
     def debug(self):
         print("Block stats: ", end = '')
         for block in self.board.blocks:

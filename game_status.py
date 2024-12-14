@@ -7,3 +7,4 @@ class GameStatus:
     MORTGAGING = 12
     PROP_TARGET_SELECTION = 13
     SHOWING_EVENT_CARD = 14
+    

@@ -1,3 +1,6 @@
+# TODO: Merge Player icons into board center
+
+
 import pygame
 from TaiwanMap import *
 

@@ -40,6 +40,13 @@ class ActionMenuWindow:
         self.cancel_button_rect = self.cancel_button.get_rect()
         self.cancel_button_rect.topleft = (self.confirm_button_rect.left + self.confirm_button_rect.width + 5, 40)
         #
+        self.prop_button = COMIC_SANS18.render("-PROPS-", 1, "#000000", "#0000FF")
+        self.prop_button_rect = self.prop_button.get_rect()
+        self.prop_button_rect.topleft = addCoordinates(self.window_rect.topleft, (5, 80))
+        self.stocks_button = COMIC_SANS18.render("-STOCKS-", 1, "#000000", "#0000FF")
+        self.stocks_button_rect = self.stocks_button.get_rect()
+        self.stocks_button_rect.topleft = addCoordinates(self.window_rect.topleft, (105, 80))
+        #
         self.buy_button_disabled = True
         self.buy_button_disable_mask = pygame.Surface((self.buy_button_rect.width, self.buy_button_rect.height), pygame.SRCALPHA)
         self.buy_button_disable_mask.fill((0, 0, 0, 150))
@@ -55,6 +62,8 @@ class ActionMenuWindow:
         screen.blit(self.window, self.window_rect)
         screen.blit(self.player_name, self.player_name_rect)
         screen.blit(self.player_balance, self.player_balance_rect)
+        screen.blit(self.prop_button, self.prop_button_rect)
+        screen.blit(self.stocks_button, self.stocks_button_rect)
         if game_status == GameStatus.WAIT_FOR_TRANSACTIONS:
             screen.blit(self.sell_button, self.sell_button_rect)
             screen.blit(self.buy_button, self.buy_button_rect)
@@ -64,11 +73,14 @@ class ActionMenuWindow:
         elif game_status == GameStatus.SELLING:
             screen.blit(self.confirm_button, self.confirm_button_rect)
             screen.blit(self.cancel_button, self.cancel_button_rect)
+        elif game_status == GameStatus.PROP_TARGET_SELECTION:
+            screen.blit(self.confirm_button, self.confirm_button_rect)
+            screen.blit(self.cancel_button, self.cancel_button_rect)
 
 class BlockInformation:
     def __init__(self, screen_size):
         self.screen_width, self.screen_height = screen_size
-        self.window = pygame.transform.scale(pygame.image.load("Assets/action menu/white.png"), (int(self.screen_width * 0.4), int(self.screen_height / 2)))
+        self.window = pygame.transform.scale(pygame.image.load("Assets/action menu/white.png"), (int(self.screen_width * 0.25), int(self.screen_height / 2)))
         self.window_rect = self.window.get_rect()
         self.window_rect.topleft = (400, 200)
         #
@@ -140,7 +152,12 @@ class BlockInformation:
         screen.blit(self.block_purchase_price_label, self.block_purchase_price_label_rect)
 
 class BoardCenter:
-    def __init__(self, board_center_image: pygame.Surface, board_center_rect: pygame.Rect, block_icon_topleft: tuple[int], block_icons: list[pygame.Surface]):
+    def __init__(self, 
+            board_center_image: pygame.Surface, 
+            board_center_rect: pygame.Rect, 
+            block_icon_topleft: tuple[int], 
+            block_icons: list[pygame.Surface]
+        ):
         self.window = pygame.transform.scale(board_center_image, (board_center_rect.width, board_center_rect.height))
         self.window_rect = board_center_rect
         # Onselect Block 
@@ -200,7 +217,8 @@ class StockTransactions:
         for label, topleft in self.labels:
             self.window.blit(label, topleft)
         #
-    def renderToScreen(self, screen: pygame.Surface):
+    def renderToScreen(self, screen: pygame.Surface, game_state):
+        print(game_state)
         screen.blit(self.window, self.window_rect)
         for price, rect in self.prices:
             screen.blit(price, rect)
@@ -238,20 +256,23 @@ class StockTransactions:
         return rect_and_func
 
 class PropsSection:
-    def __init__(self, background_image, prop_amount_limit: int):
-        self.windon_image: pygame.Surface = background_image
-        self.window_rect: pygame.Rect = self.windon_image.get_rect()
+    def __init__(self, screen_size, background_image, prop_amount_limit: int):
+        self.screen_width, self.screen_height = screen_size
+        self.window = pygame.transform.scale(background_image, (int(self.screen_width * 0.4), int(self.screen_height / 4 * 3)))
+        self.window_rect = self.window.get_rect()
+        self.window_rect.topleft = (int(self.screen_width * 0.6), int(self.screen_height / 4))
         #
         self.prop_amount_limit = prop_amount_limit
         self.props_list: List[Prop] = []
         self.props_list_topleft: List[Tuple[int]] = []
         for i in range(0, self.prop_amount_limit):
-            self.props_list_topleft.append((self.window_rect.top + i * 40))
+            self.props_list_topleft.append((i * 55, 0))
     def updateToPlayer(self, player: Player):
-        self.prop_list = player.props
-        for i, prop in enumerate(self.prop_list):
-            prop.setTopleft(addCoordinates(self.window_rect, self.props_list_topleft[i]))
+        self.props_list = player.props
+        for i, prop in enumerate(self.props_list):
+            prop.setTopleft(addCoordinates(self.window_rect.topleft, self.props_list_topleft[i]))
     def renderToScreen(self, screen: pygame.Surface):
-        for prop in self.prop_list:
+        screen.blit(self.window, self.window_rect)
+        for prop in self.props_list:
             prop.renderToScreen(screen)
     

@@ -357,19 +357,26 @@ def generateGame() -> Game:
         Stock("Foxconn", 400), 
         Stock("Delta", 300)
     ])
+    player_icons = [
+        PlayerIcon(pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/PlayerIcons/Birdy.png"), (100, 100)), (205, 105)), 
+        PlayerIcon(pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/PlayerIcons/Birdy.png"), (100, 100)), (305, 105)), 
+        PlayerIcon(pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/PlayerIcons/Birdy.png"), (100, 100)), (405, 105)), 
+        PlayerIcon(pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/PlayerIcons/Birdy.png"), (100, 100)), (505, 105))
+    ]
     players = [
-        Player("Alice", 0, player_token[0], StockMarketAccount(market), [], balance = 25000), 
-        Player("Bob", 1, player_token[1], StockMarketAccount(market), [], balance = 25000), 
-        Player("Sean", 2, player_token[2], StockMarketAccount(market), [], balance = 25000), 
-        Player("Andrew", 3, player_token[3], StockMarketAccount(market), [], balance = 25000)
+        Player("Alice", 0, player_token[0], player_icons[0], StockMarketAccount(market), [Bomb(), Bomb(), Bomb()], balance = 25000, health_point = 100), 
+        Player("Bob", 1, player_token[1], player_icons[1], StockMarketAccount(market), [Bomb()], balance = 25000, health_point = 100), 
+        Player("Sean", 2, player_token[2], player_icons[2], StockMarketAccount(market), [Bomb()], balance = 25000, health_point = 100), 
+        Player("Andrew", 3, player_token[3], player_icons[3], StockMarketAccount(market), [Bomb()], balance = 25000, health_point = 100)
     ]
     game = Game(
         (1280, 720), 
         board,  
         players, 
-        pygame.image.load("Assets/TaiwanBoard/Backgrounds/ActionMenu.png"), 
+        pygame.image.load("Assets/TaiwanBoard/raw/white.png"), 
         market, 
         pygame.image.load("Assets/TaiwanBoard/raw/white.png"), 
+        pygame.image.load("Assets/action menu/green.png"), 
         icons
     )
     game.now_player_index = 0
