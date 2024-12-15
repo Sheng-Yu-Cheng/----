@@ -19,8 +19,8 @@ class EventCard:
         self.selected = False
         #
         self.effect: Callable = effect
-    def doEffect(self, block, selected_blocks, board, now_player, players):
-        self.effect(block, selected_blocks, board, now_player, players)
+    def doEffect(self, block, selected_blocks, board, now_player, selected_players, players):
+        self.effect(block, selected_blocks, board, now_player, selected_players, players)
     
 class EventCardDeck:
     def __init__(self, deck: List[EventCard]):

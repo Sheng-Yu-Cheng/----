@@ -51,6 +51,9 @@ class Player:
         self.props: List[Prop] = props
         #
         self.stop_round = 0
+        self.airport_designated_destination = -1
+        self.double_steps = False
+        self.half_steps = False
         #
         self.icon = icon
         #

@@ -21,7 +21,10 @@ class BlockType:
     IN_JAIL_OR_JUST_VISITING = 9
     FREE_PARKING = 10
     IMPRISON = 11
-    CORNER = (8, 9, 10, 11)
+    AIRPORT = 12
+    HARBOR = 13
+    RENOVATION_COMPARY = 14
+    CORNER = (8, 9, 10, 11, 12, 13, 14)
     
 class BlockStatus:
     # basic (2 bit)
@@ -37,7 +40,9 @@ class Block:
         self.type = type
         self.index = index
         self.status = status
-        # 
+        #
+        self.has_barrier = False
+        #
         self.image = image
         self.rect = self.image.get_rect()
     def generateMask(self):
@@ -67,6 +72,7 @@ class PropertyBlock(Block):
         self.purchase_price = purchase_price
         self.mortagate_price = mortagate_price
         self.rent_chart = rent_chart
+        self.rent_disabled_round = 0
 
 class StreetBlock(PropertyBlock):
     def __init__(self, image: pygame.Surface, name, index, purchase_price, mortagate_price, house_price_chart, rent_chart, color_group, house_amount, owner = None, status = BlockStatus.ENABLED):
@@ -127,3 +133,14 @@ class ImprisonBlock(Block):
     def __init__(self, image: pygame.Surface, name, index, status = BlockStatus.ENABLED):
         super().__init__(image, name, BlockType.IMPRISON, index, status)
 
+class AirportBlock(Block):
+    def __init__(self, image: pygame.Surface, name, index, status = BlockStatus.ENABLED):
+        super().__init__(image, name, BlockType.AIRPORT, index, status)
+
+class HarborBlock(Block):
+    def __init__(self, image: pygame.Surface, name, index, status = BlockStatus.ENABLED):
+        super().__init__(image, name, BlockType.HARBOR, index, status)
+
+class RenovationCompanyBlcok(Block):
+    def __init__(self, image: pygame.Surface, name, index, status = BlockStatus.ENABLED):
+        super().__init__(image, name, BlockType.RENOVATION_COMPARY, index, status)

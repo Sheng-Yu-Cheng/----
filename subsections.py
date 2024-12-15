@@ -173,7 +173,15 @@ class BoardCenter:
         screen.blit(self.window, self.window_rect)
         if self.onselect_block != None:
             screen.blit(self.onselect_block, self.block_icon_topleft)
-            
+
+class StockNews:
+    def __init__(self, screen_size, background_image: pygame.Surface):
+        self.screen_width, self.screen_height = screen_size
+        self.window = pygame.transform.scale(background_image, (int(self.screen_width * 0.4), int(self.screen_height / 4 * 3)))
+        self.window_rect = self.window.get_rect()
+        self.window_rect.topleft = (int(self.screen_width * 0.6), int(self.screen_height / 4))
+
+
 class StockTransactions:
     def __init__(self, screen_size, background_image: pygame.Surface, market: StockMarket):
         self.screen_width, self.screen_height = screen_size
@@ -182,18 +190,22 @@ class StockTransactions:
         self.window_rect.topleft = (int(self.screen_width * 0.6), int(self.screen_height / 4))
         #
         self.market: StockMarket = market
-        self.labels = [
-            (COMIC_SANS18.render("Market Value", 1, "#000000"), (5, 5)), 
-            (COMIC_SANS18.render("stock", 1, "#000000"), (5, 100)), 
-            (COMIC_SANS18.render("value", 1, "#000000"), (105, 100)), 
-            (COMIC_SANS18.render("owned", 1, "#000000"), (205, 100))
+        self.market_value = pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/Stock/StockChart.png"), (540, 300))
+        self.market_value_rect = self.market_value.get_rect()
+        self.market_value_rect.topleft = (5, 5)
+        self.window.blit(self.market_value, self.market_value_rect)
+        self.labels = [ 
+            (COMIC_SANS18.render("stock", 1, "#000000"), (5, 305)), 
+            (COMIC_SANS18.render("value", 1, "#000000"), (105, 305)), 
+            (COMIC_SANS18.render("owned", 1, "#000000"), (205, 305))
         ]
-        self.prices = []
-        self.owned = []
-        self.add_buttons = []
-        self.minus_buttons = []
+        self.prices: List[List[pygame.Surface, pygame.Rect]] = []
+        self.owned: List[List[pygame.Surface, pygame.Rect]] = []
+        self.add_buttons: List[List[pygame.Surface, pygame.Rect]] = []
+        self.minus_buttons: List[List[pygame.Surface, pygame.Rect]] = []
+        y = 0
         for i, stock_name in enumerate(self.market.stocks):
-            y = 120 + i * 20
+            y = 325 + i * 20
             name = COMIC_SANS18.render(stock_name, 1, "#000000")
             name_rect = name.get_rect()
             name_rect.topleft = (5, y)
@@ -214,9 +226,33 @@ class StockTransactions:
             minus_button_rect = minus_button.get_rect()
             minus_button_rect.topleft = addCoordinates((325, y), self.window_rect.topleft)
             self.minus_buttons.append([minus_button, minus_button_rect])
+        y += 20
         for label, topleft in self.labels:
             self.window.blit(label, topleft)
-        #
+        # market value graph
+        self.colors = {
+            "Foxconn": "#FF0000", 
+            "TSMC" : "#FFFF00", 
+            "Delta": "#0000FF"
+        }
+        self.market_value_xcoordinate = [77 + i * 53 + self.window_rect.x for i in range(10)]
+        self.market_value_ytop, self.market_value_ybottom = 65, 235
+        self.market_value_max, self.market_value_min = 3000, 0
+        # 
+        self.lines = []
+    def updateText(self):
+        text = self.market.aiResponse()
+        y = 400
+        i, j, l = 0, 30 , 0
+        self.lines = []
+        while j <= len(text):
+            self.lines.append((HUNINN18.render(text[i:j], 1, "#000000"), addCoordinates((0, y + 20 * l), self.window_rect.topleft)))
+            i += 30
+            j += 30
+            l += 1
+        self.lines.append((HUNINN18.render(text[i:], 1, "#000000"), addCoordinates((0, y + 20 * l), self.window_rect.topleft)))
+    def calculateYByValue(self, value):
+        return int(self.window_rect.top + self.market_value_ytop + (self.market_value_ybottom - self.market_value_ytop) * (self.market_value_max - value) / (self.market_value_max - self.market_value_min))
     def renderToScreen(self, screen: pygame.Surface):
         screen.blit(self.window, self.window_rect)
         for price, rect in self.prices:
@@ -226,7 +262,22 @@ class StockTransactions:
         for button, rect in self.add_buttons:
             screen.blit(button, rect)
         for button, rect in self.minus_buttons:
-            screen.blit(button, rect)    
+            screen.blit(button, rect)  
+        for line, rect in self.lines:
+            screen.blit(line, rect)
+        # draw stock lines
+        for record in self.market.record:
+            color = self.colors[record]
+            record = self.market.record[record]
+            i, j = 0, 1
+            start_pos = (self.market_value_xcoordinate[0], self.calculateYByValue(record[0]))
+            end_pos = (self.market_value_xcoordinate[1], self.calculateYByValue(record[1]))
+            while j < 9:
+                pygame.draw.line(screen, color, start_pos, end_pos, 2)
+                i += 1
+                j += 1
+                start_pos = end_pos
+                end_pos = (self.market_value_xcoordinate[j], self.calculateYByValue(record[j]))
     def updateToPlayer(self, player: Player):
         for i, stock_name in enumerate(self.market.stocks):
             self.prices[i][0] = COMIC_SANS18.render(f'{self.market.stocks[stock_name].value}', 1, "#000000")
@@ -265,7 +316,7 @@ class PropsSection:
         self.props_list: List[Prop] = []
         self.props_list_topleft: List[Tuple[int]] = []
         for i in range(0, self.prop_amount_limit):
-            self.props_list_topleft.append((i * 55, 0))
+            self.props_list_topleft.append((i * 240, 0))
     def updateToPlayer(self, player: Player):
         self.props_list = player.props
         for i, prop in enumerate(self.props_list):
