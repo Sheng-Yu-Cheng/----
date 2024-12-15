@@ -6,16 +6,24 @@ class EventCard:
     def __init__(self, 
             image: pygame.Surface, 
             weight: int, 
-            need_selection: bool = False, 
-            target_filter: Callable = lambda: None, 
+            need_block_selection: bool = False, 
+            block_target_filter: Callable = lambda x, y, z, w: False, 
+            block_target_maxmium: int = 0, 
+            need_player_selection: bool = False, 
+            player_target_filter: Callable = lambda x, y, z: False,
+            player_target_maxmimum: int = 0, 
             effect: Callable = lambda: None
         ):
         self.image = image
         self.rect = image.get_rect()
         self.weight = weight
         #
-        self.need_selection = need_selection
-        self.target_filter = target_filter
+        self.need_block_selection = need_block_selection
+        self.block_target_filter = block_target_filter
+        self.block_target_maxmium = block_target_maxmium
+        self.need_player_selection = need_player_selection
+        self.player_target_filter = player_target_filter
+        self.player_target_maxmimum = player_target_maxmimum
         self.selected = False
         #
         self.effect: Callable = effect

@@ -42,6 +42,7 @@ class Block:
         self.status = status
         #
         self.has_barrier = False
+        self.has_bomb = False
         #
         self.image = image
         self.rect = self.image.get_rect()

@@ -80,9 +80,9 @@ class ActionMenuWindow:
 class BlockInformation:
     def __init__(self, screen_size):
         self.screen_width, self.screen_height = screen_size
-        self.window = pygame.transform.scale(pygame.image.load("Assets/action menu/white.png"), (int(self.screen_width * 0.25), int(self.screen_height / 2)))
+        self.window = pygame.transform.scale(pygame.image.load("Assets/action menu/green.png"), (int(self.screen_width * 0.184), int(self.screen_height * 0.6)))
         self.window_rect = self.window.get_rect()
-        self.window_rect.topleft = (400, 200)
+        self.window_rect.topleft = (405, 205)
         #
         self.block_name = COMIC_SANS18.render("", 1, "#000000")
         self.block_name_rect = self.block_name.get_rect()
@@ -109,9 +109,14 @@ class BlockInformation:
         self.block_rent_rect.topleft = addCoordinates(self.window_rect.topleft, (5, 105))
         #
     def updateToBlock(self, block: BLOCK, player_list: List[Player]):
-        self.block_name = COMIC_SANS18.render(block.name, 1, "#000000")
-        self.additional_information = []
-        if isinstance(block, StreetBlock):
+        if block == None:
+            self.block_name = COMIC_SANS18.render("", 1, "#000000")
+            self.block_owner = COMIC_SANS18.render("", 1, "#000000")
+            self.block_purchase_price_label = COMIC_SANS18.render("", 1, "#000000")
+            self.block_purchase_price = COMIC_SANS18.render("", 1, "#000000")
+            self.block_rent_label = COMIC_SANS18.render("", 1, "#000000")
+            self.block_rent = COMIC_SANS18.render("", 1, "#000000")
+        elif isinstance(block, StreetBlock):
             owner = player_list[block.owner].name if block.owner != None else None
             self.block_owner = COMIC_SANS18.render(f"Owner: {owner}", 1, "#000000")
             self.block_purchase_price_label = HUNINN18.render(f"SP---1H---2H---3H---4H---5H---", 1, "#000000")
@@ -137,6 +142,7 @@ class BlockInformation:
             chart = block.rent_chart
             self.block_rent = HUNINN18.render(f"{str(chart[0]).ljust(5, '-')}{str(chart[1]).ljust(5, '-')}", 1, "#000000")
         else:
+            self.block_name = COMIC_SANS18.render(block.name, 1, "#000000")
             self.block_owner = COMIC_SANS18.render("", 1, "#000000")
             self.block_purchase_price_label = COMIC_SANS18.render("", 1, "#000000")
             self.block_purchase_price = COMIC_SANS18.render("", 1, "#000000")

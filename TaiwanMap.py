@@ -7,75 +7,192 @@ from player import *
 import pygame
 
 
-def generateGame() -> Game:
+def Pistol() -> Prop:
+    def pistol(block, selected_blocks, board, now_player, selected_players, players):
+        for player in selected_players:
+            player.health_points -= 40
+            if player.health_points <= 0:
+                player.stop_round = 2
+                player.health_points = 100
+    return Prop(
+        "Pistol", 
+        pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/Props/Pistol.jpg"), (240, 320)), 
+        need_player_selection = True, 
+        player_target_filter = lambda x, y, z:True, 
+        player_target_maximum = 1, 
+        block_target_filter = lambda x, y, z, w: False, 
+        block_target_maximum = 0, 
+        effect = pistol
+    )
 
-        # chance card deck
+def Barrier() -> Prop:
+    def setBarrier(block, selected_blocks: List[BLOCK], board, now_player, selected_players, players):
+        if len(selected_blocks) == 1:
+            selected_blocks[0].has_barrier = True
+    return Prop(
+        "Barrier", 
+        pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/Props/Barrier.jpg"), (240, 320)), 
+        need_player_selection = False, 
+        player_target_filter = lambda x, y, z:False, 
+        player_target_maximum = 0, 
+        need_block_selection = True, 
+        block_target_filter = lambda x, y, z, w: True, 
+        block_target_maximum = 1, 
+        effect = setBarrier
+    )
+
+def Rabbit() -> Prop:
+    def rabbit(block, selected_blocks: List[BLOCK], board, now_player, selected_players, players):
+        now_player.double_steps = True
+    return Prop(
+        "Rabbit", 
+        pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/Props/Rabbit.jpg"), (240, 320)), 
+        need_player_selection = False, 
+        player_target_filter = lambda x, y, z:False, 
+        player_target_maximum = 0, 
+        need_block_selection = False, 
+        block_target_filter = lambda x, y, z, w: False, 
+        block_target_maximum = 1, 
+        effect = rabbit
+    )
+
+def Turtle() -> Prop:
+    def turtle(block, selected_blocks: List[BLOCK], board, now_player, selected_players, players):
+        now_player.half_steps = True
+    return Prop(
+        "Trutle", 
+        pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/Props/Turtle.jpg"), (240, 320)), 
+        need_player_selection = False, 
+        player_target_filter = lambda x, y, z:False, 
+        player_target_maximum = 0, 
+        need_block_selection = False, 
+        block_target_filter = lambda x, y, z, w: False, 
+        block_target_maximum = 1, 
+        effect = turtle
+    )
+
+def Bomb() -> Prop:
+    def bomb(block, selected_blocks: List[BLOCK], board, now_player, selected_players, players):
+        block.has_bomb = True
+    return Prop(
+        "Trutle", 
+        pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/Props/Gernade.jpg"), (240, 320)), 
+        need_player_selection = False, 
+        player_target_filter = lambda x, y, z:False, 
+        player_target_maximum = 0, 
+        need_block_selection = False, 
+        block_target_filter = lambda x, y, z, w: False, 
+        block_target_maximum = 0, 
+        effect = bomb
+    )
+
+def Lord() -> Prop:
+    def lord(block: BLOCK, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players: List[Player], players: list[Player]):
+        selected_blocks[0].owner = now_player.index
+    def filter(block, board, now_player_index, players):
+        return isinstance(block, BLOCK) and block.owner != now_player_index
+    return Prop(
+        "Trutle", 
+        pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/Props/Lord.jpg"), (240, 320)), 
+        need_player_selection = False, 
+        player_target_filter = lambda x, y, z:False, 
+        player_target_maximum = 0, 
+        need_block_selection = True, 
+        block_target_filter = filter, 
+        block_target_maximum = 1, 
+        effect = lord
+    )
+
+def Digger() -> Prop:
+    def digger(block: BLOCK, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players: List[Player], players: list[Player]):
+        selected_blocks[0].house_amount = 0
+    def filter(block, board, now_player_index, players):
+        return isinstance(block, BLOCK) and block.owner != now_player_index
+    return Prop(
+        "Trutle", 
+        pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/Props/Digger.jpg"), (240, 320)), 
+        need_player_selection = False, 
+        player_target_filter = lambda x, y, z:False, 
+        player_target_maximum = 0, 
+        need_block_selection = True, 
+        block_target_filter = filter, 
+        block_target_maximum = 1, 
+        effect = digger
+    )
+
+# TODO
+def CreditCard() ->Prop:
+    pass
+
+def generateGame() -> Game:
+    # chance card deck
     chance_card_deck_list = []
 
     # 一百塊
     image_1 = pygame.transform.scale(pygame.image.load("Assets/EventCards/Chance/一百塊 勒.jpg"), (500, 725))
     def addOneHundred(block: BLOCK, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players: List[Player], players: list[Player]):
         now_player.balance += 100
-    chance_card_deck_list.append(EventCard(image_1, 10, need_selection=False, effect=addOneHundred))
+    chance_card_deck_list.append(EventCard(image_1, 10, effect=addOneHundred))
 
     # 小新的車車
     image_2 = pygame.transform.scale(pygame.image.load("Assets/EventCards/Chance/小新的車車.jpg"), (500, 725))
     def aCar(block: BLOCK, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players: List[Player], players: list[Player]):
         if len(now_player.props) <= 4:
             now_player.props.append(Rabbit())
-    chance_card_deck_list.append(EventCard(image_2, 10, need_selection=False, effect=aCar))
+    chance_card_deck_list.append(EventCard(image_2, 10, effect=aCar))
 
     # 出事了阿北
     image_3 = pygame.transform.scale(pygame.image.load("Assets/EventCards/Chance/出事了阿北.jpg"), (500, 725))
     def kP(block: BLOCK, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players: List[Player], players: list[Player]):
         now_player.position = now_player.token_position = board.prison_block_index
-        now_player = now_player
         now_block = board.blocks[board.prison_block_index]
         now_player.stop_round = 3
         now_player.token.rect.topleft = addCoordinates(now_block.rect.center, TOKEN_OFFSET[now_player.index])
-    chance_card_deck_list.append(EventCard(image_3, 10, need_selection=False, effect=kP))
+    chance_card_deck_list.append(EventCard(image_3, 10, effect=kP))
 
     # 外星人
     image_4 = pygame.transform.scale(pygame.image.load("Assets/EventCards/Chance/外星人.jpg"), (500, 725))
     def aliens(block: BLOCK, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players: List[Player], players: list[Player]):
         now_player.stop_round = 1
-    chance_card_deck_list.append(EventCard(image_4, 5, need_selection=False, effect=aliens))
+    chance_card_deck_list.append(EventCard(image_4, 5, effect=aliens))
 
     # 快不行了
     image_5 = pygame.transform.scale(pygame.image.load("Assets/EventCards/Chance/快不行了.jpg"), (500, 725))
     def scldIsNightmare(block: BLOCK, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players: List[Player], players: list[Player]):
         now_player.balance -= 1000
-    chance_card_deck_list.append(EventCard(image_5, 10, need_selection=False, effect=scldIsNightmare))
+    chance_card_deck_list.append(EventCard(image_5, 10, effect=scldIsNightmare))
 
     # 穿牆術
     image_6 = pygame.transform.scale(pygame.image.load("Assets/EventCards/Chance/穿牆術.jpg"), (500, 725))
     def passWall(block: BLOCK, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players: List[Player], players: list[Player]):
-        pass
-    chance_card_deck_list.append(EventCard(image_6, 10, need_selection=False, effect=passWall))
+        now_player.invisible_round = True
+    chance_card_deck_list.append(EventCard(image_6, 10, effect=passWall))
 
     # 野豬騎士
     image_7 = pygame.transform.scale(pygame.image.load("Assets/EventCards/Chance/野豬騎士.jpg"), (500, 725))
     def hogRider(block: BLOCK, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players: List[Player], players: list[Player]):
-        pass
-    chance_card_deck_list.append(EventCard(image_7, 5, need_selection=False, target_filter=True, effect=hogRider))
+        selected_blocks[0].owner = now_player.index
+    def hogRiderBlockTargetFilter(block, board, now_player_index, players):
+        return isinstance(block, BLOCK) and block.owner != now_player_index
+    chance_card_deck_list.append(EventCard(image_7, 5, need_block_selection=True, block_target_filter = hogRiderBlockTargetFilter, block_target_maxmium=1, effect=hogRider))
 
     # 撿到錢包
     image_8 = pygame.transform.scale(pygame.image.load("Assets/EventCards/Chance/撿到錢包.jpg"), (500, 725))
     def aWallet(block: BLOCK, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players: List[Player], players: list[Player]):
         now_player.balance += 1000
-    chance_card_deck_list.append(EventCard(image_8, 8, need_selection=False, effect=aWallet))
+    chance_card_deck_list.append(EventCard(image_8, 8, effect=aWallet))
 
     # 幫幫人民的啦
     image_9 = pygame.transform.scale(pygame.image.load("Assets/EventCards/Chance/幫幫人民的啦.jpg"), (500, 725))
     def giveMoney(block: BLOCK, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players: List[Player], players: list[Player]):
         now_player.balance -= 1000
-    chance_card_deck_list.append(EventCard(image_9, 8, need_selection=False, effect=giveMoney))
+    chance_card_deck_list.append(EventCard(image_9, 8, effect=giveMoney))
 
     # chill guy
     image_10 = pygame.transform.scale(pygame.image.load("Assets/EventCards/chance/chill guy.jpg"), (500, 725))
     def chillGuy(block: BLOCK, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players: List[Player], players: list[Player]):
         now_player.stop_round = 1
-    chance_card_deck_list.append(EventCard(image_10, 10, need_selection=False, effect=chillGuy))
+    chance_card_deck_list.append(EventCard(image_10, 10, effect=chillGuy))
 
     # Community Chest Deck
     community_chest_deck_list = []
@@ -83,56 +200,69 @@ def generateGame() -> Game:
     # 大爆炸
     image_11 = pygame.transform.scale(pygame.image.load("Assets/EventCards/CommunityChest/大爆炸.jpg"), (500, 725))
     def explosion(block: BLOCK, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players: List[Player], players: list[Player]):
-        pass
-    community_chest_deck_list.append(EventCard(image_11, 2, need_selection=False, effect=explosion))
+        for blk in board.blocks:
+            blk.house_amount = 0
+    community_chest_deck_list.append(EventCard(image_11, 2, effect=explosion))
 
     # 月光刑警
     image_12 = pygame.transform.scale(pygame.image.load("Assets/EventCards/CommunityChest/月光刑警.jpg"), (500, 725))
     def moonlightPower(block: BLOCK, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players: List[Player], players: list[Player]):
-        pass
-    community_chest_deck_list.append(EventCard(image_12, 5, need_selection=False, target_filter=True , effect=moonlightPower))
+        now_player.token_position = now_player.position = selected_blocks[0].index
+        now_block = board.blocks[board.prison_block_index]
+        now_player.token.rect.topleft = addCoordinates(now_block.rect.center, TOKEN_OFFSET[now_player.index])
+    def moonlightPowerBlockTargetFilter(block, board, now_player_index, players):
+        return True
+    community_chest_deck_list.append(EventCard(image_12, 5, need_block_selection=True, block_target_filter=moonlightPowerBlockTargetFilter, block_target_maxmium=1 , effect=moonlightPower))
 
     # 出車禍
     image_13 = pygame.transform.scale(pygame.image.load("Assets/EventCards/CommunityChest/出車禍.jpg"), (500, 725))
     def michael(block: BLOCK, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players: List[Player], players: list[Player]):
-        pass
-    community_chest_deck_list.append(EventCard(image_13, 5, need_selection=False, effect=michael))
+        now_player.stop_round = 2
+    community_chest_deck_list.append(EventCard(image_13, 5, effect=michael))
 
     # 好友基德
     image_14 = pygame.transform.scale(pygame.image.load("Assets/EventCards/CommunityChest/好友基德.jpg"), (500, 725))
     def goodFreind(block: BLOCK, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players: List[Player], players: list[Player]):
-        pass
-    community_chest_deck_list.append(EventCard(image_14, 5, need_selection=False, effect=goodFreind))
+        now_player.balance += randint(10000, 20000)
+    community_chest_deck_list.append(EventCard(image_14, 5, effect=goodFreind))
 
     # 凍蒜
     image_15 = pygame.transform.scale(pygame.image.load("Assets/EventCards/CommunityChest/凍蒜.jpg"), (500, 725))
     def tiKoLiang(block: BLOCK, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players: List[Player], players: list[Player]):
-        pass
-    community_chest_deck_list.append(EventCard(image_15, 3, need_selection=False, target_filter=True, effect=tiKoLiang))
+        now_player.balance += randint(5000, 25000)
+    community_chest_deck_list.append(EventCard(image_15, 3, effect=tiKoLiang))
 
     # 跌價妖怪女
     image_16 = pygame.transform.scale(pygame.image.load("Assets/EventCards/CommunityChest/跌價妖怪女.jpg"), (500, 725))
     def Ume(block: BLOCK, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players: List[Player], players: list[Player]):
-        pass
-    community_chest_deck_list.append(EventCard(image_16, 4, need_selection=False, effect=Ume))
+        now_player.balance >>= 1
+    community_chest_deck_list.append(EventCard(image_16, 4, effect=Ume))
 
     # 檢舉達人
     image_17 = pygame.transform.scale(pygame.image.load("Assets/EventCards/CommunityChest/檢舉達人.jpg"), (500, 725))
     def reporter(block: BLOCK, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players: List[Player], players: list[Player]):
-        pass
-    community_chest_deck_list.append(EventCard(image_17, 3, need_selection=True, effect=reporter))
+        now_player.position = now_player.token_position = board.prison_block_index
+        now_block = board.blocks[board.prison_block_index]
+        now_player.stop_round = 3
+        now_player.token.rect.topleft = addCoordinates(now_block.rect.center, TOKEN_OFFSET[now_player.index])
+    community_chest_deck_list.append(EventCard(image_17, 3, need_player_selection=True, player_target_filter= lambda x, y, z: True,player_target_maxmimum=1 , effect=reporter))
 
     # 魔法小卡
     image_18 = pygame.transform.scale(pygame.image.load("Assets/EventCards/CommunityChest/魔法小卡.jpg"), (500, 725))
     def creditCard(block: BLOCK, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players: List[Player], players: list[Player]):
-        pass
-    community_chest_deck_list.append(EventCard(image_18, 3, need_selection=True, effect=creditCard))
+        now_player.props.append(CreditCard())
+    community_chest_deck_list.append(EventCard(image_18, 3, effect=creditCard))
 
     # gg
     image_19 = pygame.transform.scale(pygame.image.load("Assets/EventCards/CommunityChest/gg.jpg"), (500, 725))
     def goodGame(block: BLOCK, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players: List[Player], players: list[Player]):
-        pass
-    community_chest_deck_list.append(EventCard(image_19, 3, need_selection=False, effect=goodGame))
+        for blk in board.blocks:
+            if blk.owner == now_player.index:
+                blk.owner = None
+                blk.house_amount = 0
+        now_player.balance = 25000
+        now_player.props.clear()
+    community_chest_deck_list.append(EventCard(image_19, 3, effect=goodGame))
 
     chance_card_deck = EventCardDeck(chance_card_deck_list)
     community_chest_deck = EventCardDeck(community_chest_deck_list)
