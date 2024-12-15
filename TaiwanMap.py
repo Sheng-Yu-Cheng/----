@@ -489,10 +489,10 @@ def generateGame() -> Game:
         Stock("Delta", 1000)
     ])
     player_icons = [
-        PlayerIcon(pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/PlayerIcons/Birdy.png"), (100, 100)), (205, 105)), 
-        PlayerIcon(pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/PlayerIcons/Birdy.png"), (100, 100)), (305, 105)), 
-        PlayerIcon(pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/PlayerIcons/Birdy.png"), (100, 100)), (405, 105)), 
-        PlayerIcon(pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/PlayerIcons/Birdy.png"), (100, 100)), (505, 105))
+        PlayerIcon(pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/PlayerIcons/Birdy.png"), (100, 100)), (235, 105)), 
+        PlayerIcon(pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/PlayerIcons/Birdy.png"), (100, 100)), (335, 105)), 
+        PlayerIcon(pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/PlayerIcons/Birdy.png"), (100, 100)), (435, 105)), 
+        PlayerIcon(pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/PlayerIcons/Birdy.png"), (100, 100)), (535, 105))
     ]
     players = [
         Player("Alice", 0, player_token[0], player_icons[0], StockMarketAccount(market), [Rabbit()], balance = 25000, health_point = 100), 
