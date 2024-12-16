@@ -7,10 +7,10 @@ class Prop:
         name: str, 
         image: pygame.Surface,
         need_block_selection: bool = False, 
-        block_target_filter: Callable = lambda: None, 
+        block_target_filter: Callable = lambda block, board, now_player_index, players: False, 
         block_target_maximum: int = 0, 
         need_player_selection: bool = False, 
-        player_target_filter: Callable = lambda: None, 
+        player_target_filter: Callable = lambda player, board, now_player_index, players: False, 
         player_target_maximum: int = 0, 
         effect: Callable = lambda: None
     ):

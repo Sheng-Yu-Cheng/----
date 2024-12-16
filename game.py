@@ -148,7 +148,7 @@ class Game:
             rect_and_func.append((self.action_menu.cancel_button_rect, cancel_function))
             for player in self.players:
                 icon = player.icon
-                if not player_selection_method(self.board, self.now_player_index, self.players):
+                if not player_selection_method(player, self.board, self.now_player_index, self.players):
                     icon.disabled = True
                     continue
                 icon.disabled = False

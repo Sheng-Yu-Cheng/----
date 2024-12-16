@@ -15,9 +15,9 @@ def Pistol() -> Prop:
         "Pistol", 
         pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/Props/Pistol.jpg"), (240, 320)), 
         need_player_selection = True, 
-        player_target_filter = lambda x, y, z:True, 
+        player_target_filter = lambda player, board, now_player_index, players: player.index != now_player_index, 
         player_target_maximum = 1, 
-        block_target_filter = lambda x, y, z, w: False, 
+        block_target_filter = lambda block, board, now_player_index, players: False, 
         block_target_maximum = 0, 
         effect = pistol
     )
@@ -29,9 +29,6 @@ def Barrier() -> Prop:
     return Prop(
         "Barrier", 
         pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/Props/Barrier.jpg"), (240, 320)), 
-        need_player_selection = False, 
-        player_target_filter = lambda x, y, z:False, 
-        player_target_maximum = 0, 
         need_block_selection = True, 
         block_target_filter = lambda x, y, z, w: True, 
         block_target_maximum = 1, 
@@ -44,12 +41,6 @@ def Rabbit() -> Prop:
     return Prop(
         "Rabbit", 
         pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/Props/Rabbit.jpg"), (240, 320)), 
-        need_player_selection = False, 
-        player_target_filter = lambda x, y, z:False, 
-        player_target_maximum = 0, 
-        need_block_selection = False, 
-        block_target_filter = lambda x, y, z, w: False, 
-        block_target_maximum = 1, 
         effect = rabbit
     )
 
@@ -59,12 +50,6 @@ def Turtle() -> Prop:
     return Prop(
         "Trutle", 
         pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/Props/Turtle.jpg"), (240, 320)), 
-        need_player_selection = False, 
-        player_target_filter = lambda x, y, z:False, 
-        player_target_maximum = 0, 
-        need_block_selection = False, 
-        block_target_filter = lambda x, y, z, w: False, 
-        block_target_maximum = 1, 
         effect = turtle
     )
 
@@ -74,12 +59,6 @@ def Bomb() -> Prop:
     return Prop(
         "Trutle", 
         pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/Props/Gernade.jpg"), (240, 320)), 
-        need_player_selection = False, 
-        player_target_filter = lambda x, y, z:False, 
-        player_target_maximum = 0, 
-        need_block_selection = False, 
-        block_target_filter = lambda x, y, z, w: False, 
-        block_target_maximum = 0, 
         effect = bomb
     )
 
@@ -91,9 +70,6 @@ def Lord() -> Prop:
     return Prop(
         "Trutle", 
         pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/Props/Lord.jpg"), (240, 320)), 
-        need_player_selection = False, 
-        player_target_filter = lambda x, y, z:False, 
-        player_target_maximum = 0, 
         need_block_selection = True, 
         block_target_filter = filter, 
         block_target_maximum = 1, 
@@ -104,13 +80,10 @@ def Digger() -> Prop:
     def digger(block: BLOCK, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players: List[Player], players: list[Player]):
         selected_blocks[0].house_amount = 0
     def filter(block, board, now_player_index, players):
-        return isinstance(block, PROPERTY_BLCOK) and block.owner != now_player_index
+        return isinstance(block, PROPERTY_BLCOK) and block.owner != now_player_index and block.owner != None
     return Prop(
         "Trutle", 
         pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/Props/Digger.jpg"), (240, 320)), 
-        need_player_selection = False, 
-        player_target_filter = lambda x, y, z:False, 
-        player_target_maximum = 0, 
         need_block_selection = True, 
         block_target_filter = filter, 
         block_target_maximum = 1, 
