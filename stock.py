@@ -23,7 +23,7 @@ class Stock:
     def debugStock(self):
         return f'Stock Name = {self.name}\tMarket Value = {self.value}\n'
     def changeByRandom(self):
-        n=random.randint(800,1240)
+        n=random.randint(800,1250)
         n=n/1000
         self.value = math.ceil(self.value*n)
         self.value = min(3000, max(1, self.value))

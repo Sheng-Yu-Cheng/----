@@ -102,9 +102,9 @@ class Game:
                 for prop in now_player.props:
                     def propActivateFunctionGenerator(prop: Prop, now_game_state):
                         def trigger():
-                            if not prop.need_block_selection and not prop.need_player_selection:
-                                self.executePropEffectAndGoBackToGameState(now_game_state, prop)
-                                return
+                            # if not prop.need_block_selection and not prop.need_player_selection:
+                            #     self.executePropEffectAndGoBackToGameState(now_game_state, prop)
+                            #     return
                             self.startPropSelection(now_game_state, prop)                        
                             return
                         return trigger
@@ -119,9 +119,9 @@ class Game:
                 for prop in now_player.props:
                     def propActivateFunctionGenerator(prop: Prop, now_game_state):
                         def trigger():
-                            if not prop.need_block_selection and not prop.need_player_selection:
-                                self.executePropEffectAndGoBackToGameState(now_game_state, prop)
-                                return
+                            # if not prop.need_block_selection and not prop.need_player_selection:
+                            #     self.executePropEffectAndGoBackToGameState(now_game_state, prop)
+                            #     return
                             self.startPropSelection(now_game_state, prop)                        
                             return
                         return trigger
@@ -204,10 +204,8 @@ class Game:
         now_player = self.players[self.now_player_index]
         self.action_menu.updateWithPlayer(now_player)
         self.prop_section.updateToPlayer(now_player)
-        try:
-            self.stock_transactions.market.changeByAi(self.stock_source)
-        except:
-            self.stock_transactions.market.changeAllByRandom()
+        # self.stock_transactions.market.changeByAi(self.stock_source)
+        self.stock_transactions.market.changeAllByRandom()
         self.stock_transactions.updateText()
         self.stock_transactions.updateToPlayer(now_player)
         if now_player.airport_designated_destination != -1:
@@ -234,7 +232,7 @@ class Game:
             if player.icon.selected:
                 selected_players.append(player)
                 player.icon.selected = False
-            player.icon.disabled = False
+            player.icon.disabled = True
         prop.doEffect(now_block, selected_blocks, self.board, now_player, selected_players, self.players)
         now_player.props.remove(prop)
         self.prop_section.updateToPlayer(now_player)
@@ -247,7 +245,7 @@ class Game:
             block.status |= BlockStatus.ENABLED
         for player in self.players:
             player.icon.selected = False
-            player.icon.disabled = False
+            player.icon.disabled = True
         self.status = game_state
         self.generateCollideRectAndReactFunctionList()
     def startPropSelection(self, game_state, prop: Prop):

@@ -104,7 +104,7 @@ def Digger() -> Prop:
     def digger(block: BLOCK, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players: List[Player], players: list[Player]):
         selected_blocks[0].house_amount = 0
     def filter(block, board, now_player_index, players):
-        return isinstance(block, BLOCK) and block.owner != now_player_index
+        return isinstance(block, PROPERTY_BLCOK) and block.owner != now_player_index
     return Prop(
         "Trutle", 
         pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/Props/Digger.jpg"), (240, 320)), 
@@ -494,8 +494,8 @@ def generateGame() -> Game:
     players = [
         Player("Alice", 0, player_token[0], player_icons[0], StockMarketAccount(market), [Rabbit(), Bomb()], balance = 25000, health_point = 100), 
         Player("Bob", 1, player_token[1], player_icons[1], StockMarketAccount(market), [Turtle(), Pistol()], balance = 25000, health_point = 100), 
-        Player("Sean", 2, player_token[2], player_icons[2], StockMarketAccount(market), [Bomb(), Barrier()], balance = 25000, health_point = 100), 
-        Player("Andrew", 3, player_token[3], player_icons[3], StockMarketAccount(market), [Bomb(), Barrier()], balance = 25000, health_point = 100)
+        Player("Sean", 2, player_token[2], player_icons[2], StockMarketAccount(market), [Lord(), Barrier()], balance = 25000, health_point = 100), 
+        Player("Andrew", 3, player_token[3], player_icons[3], StockMarketAccount(market), [Digger(), Lord()], balance = 25000, health_point = 100)
     ]
     game = Game(
         (1280, 720), 
