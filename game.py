@@ -442,8 +442,10 @@ class Game:
                 now_card.player_target_filter, 
                 now_card
             )
+            now_block.deck.now_card = None
         else:
             now_card.doEffect(now_block, [], self.board, now_player, [], self.players)
+            now_block.deck.now_card = None
             self.startTransactionState()
     def confirmEventCardTargetSelection(self):
         self.selected_blocks = []
