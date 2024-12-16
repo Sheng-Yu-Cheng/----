@@ -310,7 +310,7 @@ class Game:
 
     # ------------------- DICE ---------------------
     def startRollDice(self): 
-        if not self.done_random_event and random.randint(1, 100) >= 95:
+        if not self.done_random_event and random.randint(1, 100) >= 0:
             self.done_random_event = True
             self.random_event_card_deck.drawCard()
             self.startShowingRandomEventCard()
@@ -382,6 +382,7 @@ class Game:
                     airport = Prop(
                         "Airport", 
                         pygame.Surface((1, 1)), 
+                        "", 
                         True, 
                         lambda block, y, z, w: block.type != BlockType.AIRPORT, 
                         1, 
@@ -413,6 +414,7 @@ class Game:
                     harbor = Prop(
                         "Harbor", 
                         pygame.Surface((1, 1)), 
+                        "", 
                         True, 
                         lambda w, x, y, z: False, 
                         0, 
@@ -429,6 +431,7 @@ class Game:
                     renovation_company = Prop(
                         "RenovationCompany", 
                         pygame.Surface((1, 1)), 
+                        "", 
                         True, 
                         lambda block, board, now_player_index, players: 
                             isinstance(block, PROPERTY_BLCOK) and 

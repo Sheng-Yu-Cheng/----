@@ -41,13 +41,13 @@ class EventCardDeck:
         self.now_card = None
     def drawCard(self):
         random_value = randint(1, self.total_weight)
-        L, R = 0, len(self.deck) - 1
+        L, R = 1, len(self.deck)
         while L <= R - 1:
             M = L + R >> 1
-            if self.weight_prefix_sum[M] <= random_value:
-                R = M
-            else:
+            if self.weight_prefix_sum[M] < random_value:
                 L = M + 1
-        self.now_card = self.deck[R] if self.weight_prefix_sum[R] <= random_value else self.deck[L]
+            else:
+                R = M
+        self.now_card = self.deck[R - 1] if self.weight_prefix_sum[L] < random_value else self.deck[L - 1]
     def renderToScreen(self, screen: pygame.Surface):
         screen.blit(self.now_card.image, (200, 70))

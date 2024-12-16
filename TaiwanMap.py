@@ -294,10 +294,10 @@ def generateGame() -> Game:
     board = GameBoard()
     icons = []
     #####
-    go_image = pygame.image.load("Assets/Classic Board/corner.png")
-    go = StartBlock(go_image, "Go", 0, 200)
+    go_image = pygame.image.load("Assets/TaiwanBoard/Blocks/start.png")
+    go = StartBlock(pygame.transform.scale(go_image, (80, 80)), "Go", 0, 200)
     go.rect.topleft = (640, 640)
-    icons.append(pygame.transform.scale(go_image, (300, 400)))
+    icons.append(pygame.transform.scale(go_image, (300, 300)))
     board.addBlock(go)
     #
     keelung_image = pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/Keelung.jpg"), -90)
@@ -324,8 +324,8 @@ def generateGame() -> Game:
     icons.append(pygame.transform.scale(income_tax_image, (300, 400)))
     board.addBlock(income_tax)
     #####
-    station1_image = pygame.image.load("Assets/Classic Board/event.png")
-    station1 = RailroadBlock(station1_image, "Station 1", 5, 200, 100, [50, 100, 200, 400])
+    station1_image = pygame.image.load("Assets/TaiwanBoard/Blocks/Railroad1.png")
+    station1 = RailroadBlock(pygame.transform.scale(station1_image, (60, 80)), "Station 1", 5, 200, 100, [50, 100, 200, 400])
     station1.rect.topleft = (340, 640)
     icons.append(pygame.transform.scale(station1_image, (300, 400)))
     board.addBlock(station1)
@@ -354,10 +354,10 @@ def generateGame() -> Game:
     icons.append(pygame.transform.scale(taitung_image, (300, 400)))
     board.addBlock(taitung)
     #####
-    in_jail_or_just_visit_image = pygame.image.load("Assets/Classic Board/corner.png")
-    in_jail_or_just_visit = InJailOrJustVisitingBlock(in_jail_or_just_visit_image, "In Jail/Just Visiting", 10)
+    in_jail_or_just_visit_image = pygame.image.load("Assets/TaiwanBoard/Blocks/jail.png")
+    in_jail_or_just_visit = InJailOrJustVisitingBlock(pygame.transform.scale(in_jail_or_just_visit_image, (80, 80)), "In Jail/Just Visiting", 10)
     in_jail_or_just_visit.rect.topleft = (20, 640)
-    icons.append(pygame.transform.scale(in_jail_or_just_visit_image, (300, 400)))
+    icons.append(pygame.transform.scale(in_jail_or_just_visit_image, (300, 300)))
     board.addBlock(in_jail_or_just_visit)
     #
     orchidisland_image = pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/OrchidIsland.jpg"), 180)
@@ -384,10 +384,10 @@ def generateGame() -> Game:
     icons.append(pygame.transform.scale(pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/Kaohsiung.jpg"), -90), (300, 400)))
     board.addBlock(kaohsiung)
     #####
-    station2_image = pygame.transform.rotate(pygame.image.load("Assets/Classic Board/event.png"), 270)
-    station2 = RailroadBlock(station2_image, "Station 2", 15, 200, 100, [50, 100, 200, 400])
+    station2_image = pygame.image.load("Assets/TaiwanBoard/Blocks/Railroad2.png")
+    station2 = RailroadBlock(pygame.transform.scale(pygame.transform.rotate(station2_image, 270), (80, 60)), "Station 2", 15, 200, 100, [50, 100, 200, 400])
     station2.rect.topleft = (20, 340)
-    icons.append(pygame.transform.scale(taitung_image, (300, 400)))
+    icons.append(pygame.transform.scale(station2_image, (300, 400)))
     board.addBlock(station2)
     #
     bakery1_image = pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/BakeryShop.png"), 270)
@@ -444,10 +444,10 @@ def generateGame() -> Game:
     icons.append(pygame.transform.scale(pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/BakeryShop.png"), 0), (300, 400)))
     board.addBlock(bakery2)
     #####
-    station3_image = pygame.transform.rotate(pygame.image.load("Assets/Classic Board/event.png"), 180)
-    station3 = RailroadBlock(station3_image, "Station 3", 25, 200, 100, [50, 100, 200, 400])
+    station3_image = pygame.image.load("Assets/TaiwanBoard/Blocks/Railroad3.png")
+    station3 = RailroadBlock(pygame.transform.scale(pygame.transform.rotate(station3_image, 180), (60, 80)), "Station 3", 25, 200, 100, [50, 100, 200, 400])
     station3.rect.topleft = (340, 20)
-    icons.append(pygame.transform.scale(taitung_image, (300, 400)))
+    icons.append(pygame.transform.scale(station3_image, (300, 400)))
     board.addBlock(station3)
     #
     prop2_image = pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/PropBlock.jpg"), 90)
@@ -504,10 +504,10 @@ def generateGame() -> Game:
     icons.append(pygame.transform.scale(pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/Taipei.jpg"), -90), (300, 400)))
     board.addBlock(taipei)
     #####
-    station4_image = pygame.transform.rotate(pygame.image.load("Assets/Classic Board/event.png"), 90)
-    station4 = RailroadBlock(station4_image, "Station 4", 35, 200, 100, [50, 100, 200, 400])
+    station4_image = pygame.image.load("Assets/TaiwanBoard/Blocks/Railroad4.png")
+    station4 = RailroadBlock(pygame.transform.scale(pygame.transform.rotate(station4_image, 90), (80, 60)), "Station 4", 35, 200, 100, [50, 100, 200, 400])
     station4.rect.topleft = (640, 340)
-    icons.append(pygame.transform.scale(taitung_image, (300, 400)))
+    icons.append(pygame.transform.scale(station4_image, (300, 400)))
     board.addBlock(station4)
     #
     chance3_image = pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/Chance.jpg"), 0)
