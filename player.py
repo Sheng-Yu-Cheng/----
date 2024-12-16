@@ -1,3 +1,5 @@
+from utilities import *
+from font_machine import *
 from stock import *
 from prop import *
 import pygame
@@ -61,8 +63,21 @@ class Player:
         self.token = token
         self.token_position = position
         self.bought_this_round = False
+        self.health_points_text = COMIC_SANS18.render(f"{self.health_points}/100", 1, "#000000")
+    def decreaseHealthPoint(self, amount):
+        self.health_points -= amount
+        if self.health_points <= 0:
+            self.stop_round = 2
+        self.health_points_text = COMIC_SANS18.render(f"{self.health_points}/100", 1, "#000000")
+    def stopRoundCountDown(self):
+        if self.stop_round > 0:
+            self.stop_round -= 1
+            if self.stop_round == 0 and self.health_points <= 0:
+                self.health_points = 100
+                self.health_points_text = COMIC_SANS18.render(f"{self.health_points}/100", 1, "#000000")
     def renderToScreen(self, screen: pygame.Surface):
         screen.blit(self.token.image, self.token.rect)
         self.icon.renderToScreen(screen)
+        screen.blit(self.health_points_text, addCoordinates(self.icon.rect, (0, 40)))
 
 

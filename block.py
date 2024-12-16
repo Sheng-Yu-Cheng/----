@@ -7,24 +7,26 @@ class BlockType:
     STREET = 1
     RAILROAD = 2
     UTILITY = 3
-    PROPERTIES = (1, 2, 3)
+    BREAD_STORE = 4
+    PROPERTIES = (1, 2, 3, 4)
     # event
-    CHANCE = 4
-    COMMUNITY_CHEST = 5
-    EVENT = (4, 5)
+    CHANCE = 11
+    COMMUNITY_CHEST = 12
+    EVENT = (11, 12)
     # tax
-    LUXURY_TAX = 6
-    INCOME_TAX = 7
-    TAX = (6, 7)
+    LUXURY_TAX = 21
+    INCOME_TAX = 22
+    TAX = (21, 22)
     # corners
-    START = 8
-    IN_JAIL_OR_JUST_VISITING = 9
-    FREE_PARKING = 10
-    IMPRISON = 11
-    AIRPORT = 12
-    HARBOR = 13
-    RENOVATION_COMPARY = 14
-    CORNER = (8, 9, 10, 11, 12, 13, 14)
+    START = 31
+    IN_JAIL_OR_JUST_VISITING = 32
+    FREE_PARKING = 33
+    IMPRISON = 34
+    AIRPORT = 35
+    HARBOR = 36
+    RENOVATION_COMPARY = 37
+    PROP_BLOCK = 38
+    CORNER = (31, 32, 33, 34, 35, 36, 37, 38)
     
 class BlockStatus:
     # basic (2 bit)
@@ -86,6 +88,12 @@ class RailroadBlock(PropertyBlock):
     def __init__(self, image: pygame.Surface, name, index, purchase_price, mortagate_price, rent_chart, owner = None, status = BlockStatus.ENABLED):
         super().__init__(image, name, BlockType.RAILROAD, index, purchase_price, mortagate_price, rent_chart, owner, status)
 
+
+class BreadStoreBlock(PropertyBlock):
+    def __init__(self, image: pygame.Surface, name, index, purchase_price, mortagate_price, rent_chart, owner = None, status = BlockStatus.ENABLED):
+        super().__init__(image, name, BlockType.BREAD_STORE, index, purchase_price, mortagate_price, rent_chart, owner, status)
+
+
 class UtilityBlock(PropertyBlock):
     def __init__(self, image: pygame.Surface, name, index, purchase_price, mortagate_price, rent_chart, owner = None, status = BlockStatus.ENABLED):
         super().__init__(image, name, BlockType.UTILITY, index, purchase_price, mortagate_price, rent_chart, owner, status)
@@ -145,3 +153,7 @@ class HarborBlock(Block):
 class RenovationCompanyBlcok(Block):
     def __init__(self, image: pygame.Surface, name, index, status = BlockStatus.ENABLED):
         super().__init__(image, name, BlockType.RENOVATION_COMPARY, index, status)
+
+class PropBlcok(Block):
+    def __init__(self, image: pygame.Surface, name, index, status = BlockStatus.ENABLED):
+        super().__init__(image, name, BlockType.PROP_BLOCK, index, status)

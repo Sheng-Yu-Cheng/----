@@ -117,6 +117,7 @@ class BlockInformation:
             self.block_rent_label = COMIC_SANS18.render("", 1, "#000000")
             self.block_rent = COMIC_SANS18.render("", 1, "#000000")
         elif isinstance(block, StreetBlock):
+            self.block_name = COMIC_SANS18.render(block.name, 1, "#000000")
             owner = player_list[block.owner].name if block.owner != None else None
             self.block_owner = COMIC_SANS18.render(f"Owner: {owner}", 1, "#000000")
             self.block_purchase_price_label = HUNINN18.render(f"SP---1H---2H---3H---4H---5H---", 1, "#000000")
@@ -126,6 +127,7 @@ class BlockInformation:
             chart = block.rent_chart
             self.block_rent = HUNINN18.render(f"{str(chart[0]).ljust(5, '-')}{str(chart[1]).ljust(5, '-')}{str(chart[2]).ljust(5, '-')}{str(chart[3]).ljust(5, '-')}{str(chart[4]).ljust(5, '-')}{str(chart[5]).ljust(5, '-')}", 1, "#000000")
         elif isinstance(block, RailroadBlock):
+            self.block_name = COMIC_SANS18.render(block.name, 1, "#000000")
             owner = player_list[block.owner].name if block.owner != None else None
             self.block_owner = COMIC_SANS18.render(f"Owner: {owner}", 1, "#000000")
             self.block_purchase_price_label = HUNINN18.render(f"SP", 1, "#000000")
@@ -134,6 +136,7 @@ class BlockInformation:
             chart = block.rent_chart
             self.block_rent = HUNINN18.render(f"{str(chart[0]).ljust(5, '-')}{str(chart[1]).ljust(5, '-')}{str(chart[2]).ljust(5, '-')}{str(chart[3]).ljust(5, '-')}", 1, "#000000")
         elif isinstance(block, UtilityBlock):
+            self.block_name = COMIC_SANS18.render(block.name, 1, "#000000")
             owner = player_list[block.owner].name if block.owner != None else None
             self.block_owner = COMIC_SANS18.render(f"Owner: {owner}", 1, "#000000")
             self.block_purchase_price_label = HUNINN18.render(f"SP", 1, "#000000")
@@ -211,7 +214,7 @@ class StockTransactions:
         self.minus_buttons: List[List[pygame.Surface, pygame.Rect]] = []
         y = 0
         for i, stock_name in enumerate(self.market.stocks):
-            y = 325 + i * 20
+            y = 325 + i * 30
             name = COMIC_SANS18.render(stock_name, 1, "#000000")
             name_rect = name.get_rect()
             name_rect.topleft = (5, y)
@@ -232,7 +235,7 @@ class StockTransactions:
             minus_button_rect = minus_button.get_rect()
             minus_button_rect.topleft = addCoordinates((325, y), self.window_rect.topleft)
             self.minus_buttons.append([minus_button, minus_button_rect])
-        y += 20
+        y += 30
         for label, topleft in self.labels:
             self.window.blit(label, topleft)
         # market value graph
@@ -248,7 +251,7 @@ class StockTransactions:
         self.lines = []
     def updateText(self):
         text = self.market.aiResponse()
-        y = 400
+        y = 430
         i, j, l = 0, 30 , 0
         self.lines = []
         while j <= len(text):
@@ -288,7 +291,7 @@ class StockTransactions:
         for i, stock_name in enumerate(self.market.stocks):
             self.prices[i][0] = COMIC_SANS18.render(f'{self.market.stocks[stock_name].value}', 1, "#000000")
             self.owned[i][0] = COMIC_SANS18.render(f'{player.stock_account.stocks[stock_name]}', 1, "#000000")
-    def getCollideRectAndReactFunctionList(self, now_player: Player):
+    def getCollideRectAndReactFunctionList(self, now_player: Player, action_menu: ActionMenuWindow):
         rect_and_func = []
         def add_button_trigger_generator(stock_name):
             def trigger():
@@ -296,6 +299,7 @@ class StockTransactions:
                     now_player.stock_account.stocks[stock_name] += 1
                     now_player.balance -= now_player.stock_account.stock_market.stocks[stock_name].value
                     self.updateToPlayer(now_player)
+                    action_menu.updateWithPlayer(now_player)
             return trigger
         def minus_button_trigger_generator(stock_name):
             def trigger():
@@ -303,6 +307,7 @@ class StockTransactions:
                     now_player.stock_account.stocks[stock_name] -= 1
                     now_player.balance += now_player.stock_account.stock_market.stocks[stock_name].value
                     self.updateToPlayer(now_player)
+                    action_menu.updateWithPlayer(now_player)
             return trigger
         for i, stock_name in enumerate(self.market.stocks):
             add, rect = self.add_buttons[i]

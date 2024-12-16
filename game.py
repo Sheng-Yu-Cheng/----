@@ -1,3 +1,4 @@
+from random import randint, shuffle
 from block import *
 from player import *
 from game_board import *
@@ -18,7 +19,8 @@ class Game:
             stock_market: StockMarket, 
             stock_transaction_background_image: pygame.Surface,
             prop_section_background_image: pygame.Surface, 
-            block_icons: List[pygame.Surface]
+            block_icons: List[pygame.Surface], 
+            all_props_generating_function: List[Prop]
         ):
         self.screen_width, self.screen_height = screen_size
         #
@@ -33,6 +35,7 @@ class Game:
         #
         self.action_menu = ActionMenuWindow(screen_size, action_menu_background_image)
         self.block_information = BlockInformation(screen_size)
+        self.stock_source = SourceMarket([Source(2330,'台積電',20241130),Source(2308,'台大電子',20241130),Source(2317,'鴻海',20241130)])
         self.stock_transactions = StockTransactions(screen_size, stock_transaction_background_image, stock_market)
         self.board_center = BoardCenter(pygame.image.load("Assets/action menu/white.png"), pygame.Rect(100, 100, 540, 540), (105, 205), block_icons)
         self.prop_section = PropsSection(screen_size, prop_section_background_image, 4)
@@ -59,6 +62,7 @@ class Game:
         self.action_menu.updateWithPlayer(self.players[self.now_player_index])
         self.stock_transactions.updateToPlayer(self.players[self.now_player_index])
         #
+        self.all_props_generating_function = all_props_generating_function
         self.generateCollideRectAndReactFunctionList()
     def renderToScreen(self, screen: pygame.Surface):
         self.action_menu.renderToScreen(screen, self.status)
@@ -89,7 +93,7 @@ class Game:
         rect_and_func.append((self.action_menu.prop_button_rect, self.changeToPropSection))
         rect_and_func.append((self.action_menu.stocks_button_rect, self.changeToStockSection))
         if not self.showing_prop_section:
-            rect_and_func.extend(self.stock_transactions.getCollideRectAndReactFunctionList(self.players[self.now_player_index]))        
+            rect_and_func.extend(self.stock_transactions.getCollideRectAndReactFunctionList(self.players[self.now_player_index], self.action_menu))        
         if self.status == GameStatus.WAIT_FOR_ROLLING_DICE:
             rect_and_func.append((self.dice.roll_dice_button_rect, self.startRollDice))
             #
@@ -116,7 +120,7 @@ class Game:
                     def propActivateFunctionGenerator(prop: Prop, now_game_state):
                         def trigger():
                             if not prop.need_block_selection and not prop.need_player_selection:
-                                self.executePropEffectAndGoBackToGameState(now_game_state)
+                                self.executePropEffectAndGoBackToGameState(now_game_state, prop)
                                 return
                             self.startPropSelection(now_game_state, prop)                        
                             return
@@ -195,12 +199,15 @@ class Game:
                 block.rent_disabled_round -= 1
         self.now_player_index = (self.now_player_index + 1) % self.player_amount
         while self.players[self.now_player_index].stop_round != 0:
-            self.players[self.now_player_index].stop_round -= 1
+            self.players[self.now_player_index].stopRoundCountDown()
             self.now_player_index = (self.now_player_index + 1) % self.player_amount
         now_player = self.players[self.now_player_index]
         self.action_menu.updateWithPlayer(now_player)
         self.prop_section.updateToPlayer(now_player)
-        self.stock_transactions.market.changeAllByRandom()
+        try:
+            self.stock_transactions.market.changeByAi(self.stock_source)
+        except:
+            self.stock_transactions.market.changeAllByRandom()
         self.stock_transactions.updateText()
         self.stock_transactions.updateToPlayer(now_player)
         if now_player.airport_designated_destination != -1:
@@ -337,13 +344,10 @@ class Game:
             if now_block.has_barrier:
                 now_player.position = now_player.token_position
                 now_block.has_barrier = False
-            if now_block.has_bomb and now_player.invisible_round:
+            if now_block.has_bomb and not now_player.invisible_round:
                 now_block.has_bomb = False
-                now_player.health_points -= 40
+                now_player.decreaseHealthPoint(80)
                 if now_player.health_points <= 0:
-                    now_player.position = now_player.token_position
-                    now_player.stop_round = 2
-                    now_player.health_points = 100
                     self.endRound()
             #
             if now_player.position == now_player.token_position:
@@ -371,9 +375,34 @@ class Game:
                         updateAirportSelection
                     )
                     self.startPropSelection(self.status, airport)
+                elif now_block.type == BlockType.PROP_BLOCK:
+                    if len(now_player.props) < 4:
+                        shuffle(self.all_props_generating_function)
+                        now_player.props.append(self.all_props_generating_function[0]())
                 elif now_block.type == BlockType.HARBOR:
-                    #TODO
-                    pass
+                    def harborEvent(block, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players, players):
+                        if randint(1, 100) > 60:
+                            now_player.position = now_player.token_position = board.prison_block_index
+                            now_block = board.blocks[board.prison_block_index]
+                            now_player.stop_round = 3
+                            now_player.token.rect.topleft = addCoordinates(now_block.rect.center, TOKEN_OFFSET[now_player.index])
+                        else:
+                            bread_stores = 0
+                            for block in self.board.blocks:
+                                if isinstance(block, BreadStoreBlock) and block.owner == now_player:
+                                    now_player.balance += randint(8000, 30000) * (1 << bread_stores)
+                    harbor = Prop(
+                        "Harbor", 
+                        pygame.Surface((1, 1)), 
+                        True, 
+                        lambda w, x, y, z: False, 
+                        0, 
+                        False,
+                        lambda x, y, z: False, 
+                        0, 
+                        harborEvent
+                    )
+                    self.startPropSelection(self.status, harbor)                    
                 elif now_block.type == BlockType.RENOVATION_COMPARY:
                     def renovation(block, selected_blocks: List[BLOCK], board, now_player: Player, selected_players, players):
                         if len(selected_blocks) == 1:
@@ -478,6 +507,9 @@ class Game:
                         possessed_utility_amount += 1
                 now_player.balance -= now_block.rent_chart[possessed_utility_amount - 1]
                 self.players[now_block.owner].balance += now_block.rent_chart[possessed_utility_amount - 1]
+        elif isinstance(now_block, BreadStoreBlock):
+            if now_block.owner == None:
+                self.action_menu.buy_button_disabled = False
         self.action_menu.updateWithPlayer(now_player)
     
 

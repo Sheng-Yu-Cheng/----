@@ -8,12 +8,9 @@ import pygame
 
 
 def Pistol() -> Prop:
-    def pistol(block, selected_blocks, board, now_player, selected_players, players):
+    def pistol(block, selected_blocks, board, now_player, selected_players: List[Player], players):
         for player in selected_players:
-            player.health_points -= 40
-            if player.health_points <= 0:
-                player.stop_round = 2
-                player.health_points = 100
+            player.decreaseHealthPoint(40)
     return Prop(
         "Pistol", 
         pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/Props/Pistol.jpg"), (240, 320)), 
@@ -90,7 +87,7 @@ def Lord() -> Prop:
     def lord(block: BLOCK, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players: List[Player], players: list[Player]):
         selected_blocks[0].owner = now_player.index
     def filter(block, board, now_player_index, players):
-        return isinstance(block, BLOCK) and block.owner != now_player_index
+        return isinstance(block, PROPERTY_BLCOK) and block.owner != now_player_index
     return Prop(
         "Trutle", 
         pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/Props/Lord.jpg"), (240, 320)), 
@@ -257,7 +254,7 @@ def generateGame() -> Game:
     image_19 = pygame.transform.scale(pygame.image.load("Assets/EventCards/CommunityChest/gg.jpg"), (500, 725))
     def goodGame(block: BLOCK, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players: List[Player], players: list[Player]):
         for blk in board.blocks:
-            if blk.owner == now_player.index:
+            if isinstance(blk, PROPERTY_BLCOK) and blk.owner == now_player.index:
                 blk.owner = None
                 blk.house_amount = 0
         now_player.balance = 25000
@@ -495,8 +492,8 @@ def generateGame() -> Game:
         PlayerIcon(pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/PlayerIcons/Birdy.png"), (100, 100)), (535, 105))
     ]
     players = [
-        Player("Alice", 0, player_token[0], player_icons[0], StockMarketAccount(market), [Rabbit()], balance = 25000, health_point = 100), 
-        Player("Bob", 1, player_token[1], player_icons[1], StockMarketAccount(market), [Turtle()], balance = 25000, health_point = 100), 
+        Player("Alice", 0, player_token[0], player_icons[0], StockMarketAccount(market), [Rabbit(), Bomb()], balance = 25000, health_point = 100), 
+        Player("Bob", 1, player_token[1], player_icons[1], StockMarketAccount(market), [Turtle(), Pistol()], balance = 25000, health_point = 100), 
         Player("Sean", 2, player_token[2], player_icons[2], StockMarketAccount(market), [Bomb(), Barrier()], balance = 25000, health_point = 100), 
         Player("Andrew", 3, player_token[3], player_icons[3], StockMarketAccount(market), [Bomb(), Barrier()], balance = 25000, health_point = 100)
     ]
@@ -508,7 +505,8 @@ def generateGame() -> Game:
         market, 
         pygame.image.load("Assets/TaiwanBoard/raw/white.png"), 
         pygame.image.load("Assets/action menu/green.png"), 
-        icons
+        icons, 
+        [Pistol, Bomb, Digger, Turtle, Rabbit, Barrier, Lord]
     )
     game.now_player_index = 0
     return game
