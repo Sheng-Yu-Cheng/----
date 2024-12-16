@@ -528,7 +528,7 @@ def generateGame() -> Game:
         pygame.image.load("Assets/TaiwanBoard/raw/white.png"), 
         pygame.image.load("Assets/action menu/green.png"), 
         icons, 
-        [Pistol, Bomb, Digger, Turtle, Rabbit, Barrier, Lord]
+        [Pistol, Bomb, Digger, Turtle, Rabbit, Barrier, Lord, Reverse]
     )
     game.now_player_index = 0
     return game
