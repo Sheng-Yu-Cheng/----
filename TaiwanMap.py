@@ -17,8 +17,6 @@ def Pistol() -> Prop:
         need_player_selection = True, 
         player_target_filter = lambda player, board, now_player_index, players: player.index != now_player_index, 
         player_target_maximum = 1, 
-        block_target_filter = lambda block, board, now_player_index, players: False, 
-        block_target_maximum = 0, 
         effect = pistol
     )
 
@@ -57,7 +55,7 @@ def Bomb() -> Prop:
     def bomb(block, selected_blocks: List[BLOCK], board, now_player, selected_players, players):
         block.has_bomb = True
     return Prop(
-        "Trutle", 
+        "Bomb", 
         pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/Props/Gernade.jpg"), (240, 320)), 
         effect = bomb
     )
@@ -68,7 +66,7 @@ def Lord() -> Prop:
     def filter(block, board, now_player_index, players):
         return isinstance(block, PROPERTY_BLCOK) and block.owner != now_player_index
     return Prop(
-        "Trutle", 
+        "Lord", 
         pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/Props/Lord.jpg"), (240, 320)), 
         need_block_selection = True, 
         block_target_filter = filter, 
@@ -82,12 +80,24 @@ def Digger() -> Prop:
     def filter(block, board, now_player_index, players):
         return isinstance(block, PROPERTY_BLCOK) and block.owner != now_player_index and block.owner != None
     return Prop(
-        "Trutle", 
+        "Digger", 
         pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/Props/Digger.jpg"), (240, 320)), 
         need_block_selection = True, 
         block_target_filter = filter, 
         block_target_maximum = 1, 
         effect = digger
+    )
+
+def Reverse() -> Prop:
+    def reverse(block: BLOCK, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players: List[Player], players: list[Player]):
+        now_player.identification = selected_players[0].index
+    return Prop(
+        "Reverse", 
+        pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/Props/reverse.jpg"), (240, 320)), 
+        need_player_selection = True, 
+        player_target_filter = lambda player, board, now_player_index, players: player.index != now_player_index, 
+        player_target_maximum = 1, 
+        effect = reverse
     )
 
 # TODO
@@ -506,7 +516,7 @@ def generateGame() -> Game:
     players = [
         Player("Alice", 0, player_token[0], player_icons[0], StockMarketAccount(market), [Rabbit(), Bomb()], balance = 25000, health_point = 100), 
         Player("Bob", 1, player_token[1], player_icons[1], StockMarketAccount(market), [Turtle(), Pistol()], balance = 25000, health_point = 100), 
-        Player("Sean", 2, player_token[2], player_icons[2], StockMarketAccount(market), [Lord(), Barrier()], balance = 25000, health_point = 100), 
+        Player("Sean", 2, player_token[2], player_icons[2], StockMarketAccount(market), [Rabbit(), Reverse()], balance = 25000, health_point = 100), 
         Player("Andrew", 3, player_token[3], player_icons[3], StockMarketAccount(market), [Digger(), Lord()], balance = 25000, health_point = 100)
     ]
     game = Game(

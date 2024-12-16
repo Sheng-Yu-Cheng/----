@@ -194,6 +194,7 @@ class Game:
     # ------------------- END ROUND ---------------------
     def endRound(self):
         self.players[self.now_player_index].invisible_round = False
+        self.players[self.now_player_index].identification = -1
         for block in self.board.blocks:
             if isinstance(block, PROPERTY_BLCOK) and block.rent_disabled_round > 0:
                 block.rent_disabled_round -= 1
@@ -482,9 +483,14 @@ class Game:
                 self.action_menu.buy_button_disabled = False
             elif now_block.owner != now_player.index:
                 self.action_menu.buy_button_disabled = True
-                if now_block.rent_disabled_round == 0:
-                    now_player.balance -= now_block.rent_chart[now_block.house_amount]
-                    self.players[now_block.owner].balance += now_block.rent_chart[now_block.house_amount]
+                if now_player.identification == -1:
+                    if now_block.rent_disabled_round == 0:
+                        now_player.balance -= now_block.rent_chart[now_block.house_amount]
+                        self.players[now_block.owner].balance += now_block.rent_chart[now_block.house_amount]
+                else:
+                    if now_block.rent_disabled_round == 0:
+                        self.players[now_player.identification].balance -= now_block.rent_chart[now_block.house_amount]
+                        self.players[now_block.owner].balance += now_block.rent_chart[now_block.house_amount]
         elif isinstance(now_block, RailroadBlock):
             if now_block.owner == None:
                 self.action_menu.buy_button_disabled = False
@@ -494,8 +500,15 @@ class Game:
                 for block in self.board.blocks:
                     if isinstance(block, RailroadBlock) and block.owner == now_block.owner:
                         possessed_railroad_amount += 1
-                now_player.balance -= now_block.rent_chart[possessed_railroad_amount - 1]
-                self.players[now_block.owner].balance += now_block.rent_chart[possessed_railroad_amount - 1]
+                if now_player.identification == -1:
+                    if now_block.rent_disabled_round == 0:
+                        now_player.balance -= now_block.rent_chart[possessed_railroad_amount - 1]
+                        self.players[now_block.owner].balance += now_block.rent_chart[possessed_railroad_amount - 1]
+                else:
+                    if now_block.rent_disabled_round == 0:
+                        self.players[now_player.identification].balance -= now_block.rent_chart[possessed_railroad_amount - 1]
+                        self.players[now_block.owner].balance += now_block.rent_chart[possessed_railroad_amount - 1]
+                
         elif isinstance(now_block, UtilityBlock):
             if now_block.owner == None:
                 self.action_menu.buy_button_disabled = False
@@ -505,11 +518,17 @@ class Game:
                 for block in self.board.blocks:
                     if isinstance(block, UtilityBlock) and block.owner == now_block.owner:
                         possessed_utility_amount += 1
-                now_player.balance -= now_block.rent_chart[possessed_utility_amount - 1]
-                self.players[now_block.owner].balance += now_block.rent_chart[possessed_utility_amount - 1]
+                if now_player.identification == -1:
+                    if now_block.rent_disabled_round == 0:
+                        now_player.balance -= now_block.rent_chart[possessed_utility_amount - 1]
+                        self.players[now_block.owner].balance += now_block.rent_chart[possessed_utility_amount - 1]
+                else:
+                    if now_block.rent_disabled_round == 0:
+                        self.players[now_player.identification].balance -= now_block.rent_chart[possessed_utility_amount - 1]
+                        self.players[now_block.owner].balance += now_block.rent_chart[possessed_utility_amount - 1]
         elif isinstance(now_block, BreadStoreBlock):
             if now_block.owner == None:
-                self.action_menu.buy_button_disabled = False
+                self.action_menu.buy_button_disabled = True
         self.action_menu.updateWithPlayer(now_player)
     
 

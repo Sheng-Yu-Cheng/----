@@ -57,6 +57,7 @@ class Player:
         self.double_steps = False
         self.invisible_round = False
         self.half_steps = False
+        self.identification = -1
         #
         self.icon = icon
         #
