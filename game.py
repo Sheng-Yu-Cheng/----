@@ -275,7 +275,9 @@ class Game:
             prop
         )
 
-    # ------------------- BLOCK INFO ---------------------
+    # ------------------- BLOCK/PROP INFO ---------------------
+    def handlePropInformationShowing(self, mouse_position):
+        self.prop_section.handleMousePosition(mouse_position)
     def handleBlockInformationShowing(self, mouse_position):
         target = None
         for block in self.board.blocks:

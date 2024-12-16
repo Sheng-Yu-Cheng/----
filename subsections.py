@@ -436,7 +436,7 @@ class PropsSection:
         self.prop_info_mask.fill((255, 255, 255))
         self.prop_info_lines = 0
         self.prop_info: List[pygame.Surface] = [HUNINN18.render("", 1, "#000000") for _ in range(10)]
-        self.prop_info_rects: List[pygame.Rect] = [pygame.Rect(0, 0, 3, 3 + 20 * i) for i in range(10)]
+        self.prop_info_rects: List[pygame.Rect] = [(3, 3 + 20 * i) for i in range(10)]
 
     def updateToPlayer(self, player: Player):
         self.props_list = player.props
@@ -445,7 +445,7 @@ class PropsSection:
     def updateToPropInfo(self, prop_info):
         i, j, self.prop_info_lines = 0, 10, 0
         while i < len(prop_info):
-            self.prop_info[self.prop_info_lines] = HUNINN18(prop_info[i:min(j,len(prop_info))], 1, '#000000')
+            self.prop_info[self.prop_info_lines] = HUNINN18.render(prop_info[i:min(j,len(prop_info))], 1, '#000000')
             i += 10
             j += 10
             self.prop_info_lines += 1
@@ -457,16 +457,17 @@ class PropsSection:
         if new_collide != self.on_viewing_prop_index:
             self.on_viewing_prop_index = new_collide
             if self.on_viewing_prop_index != -1:
-                self.updateToPlayer(self.props_list[i].description)
+                self.updateToPropInfo(self.props_list[i].description)
             
             
     def renderToScreen(self, screen: pygame.Surface):
         screen.blit(self.window, self.window_rect)
         for i, prop in enumerate(self.props_list):
             if self.on_viewing_prop_index == i:
-                screen.blit(self.prop_info_mask, prop.rect)
+                topleft = prop.rect.topleft
+                screen.blit(self.prop_info_mask, topleft)
                 for i in range(self.prop_info_lines):
-                    screen.blit(self.prop_info[i], self.prop_info_rects[i])
+                    screen.blit(self.prop_info[i], addCoordinates(topleft, self.prop_info_rects[i]))
             else:
                 prop.renderToScreen(screen)
             

@@ -16,7 +16,9 @@ while running:
             for rect, trigger in game.collide_rect_and_react_func_list:
                 if rect.collidepoint(event.pos):
                     trigger()
-    game.handleBlockInformationShowing(pygame.mouse.get_pos())
+    mouse_pos = pygame.mouse.get_pos()
+    game.handleBlockInformationShowing(mouse_pos)
+    game.handlePropInformationShowing(mouse_pos)
     screen.fill((0, 0, 0))
     game.renderToScreen(screen)
     pygame.display.flip()
