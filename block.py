@@ -118,11 +118,11 @@ class TaxBlock(Block):
 
 class LuxuryTaxBlock(TaxBlock):
     def __init__(self, image: pygame.Surface, name, index, luxury_tax, status = BlockStatus.ENABLED):
-        super().__init__(image, name, BlockType.LUXURY_TAX, index, luxury_tax, status)
+        super().__init__(image, name, BlockType.TAX, index, luxury_tax, status)
 
 class IncomeTaxBlock(TaxBlock):
     def __init__(self, image: pygame.Surface, name, index, income_tax, status = BlockStatus.ENABLED):
-        super().__init__(image, name, BlockType.INCOME_TAX, index, income_tax, status)
+        super().__init__(image, name, BlockType.TAX, index, income_tax, status)
 
 class StartBlock(Block):
     def __init__(self, image: pygame.Surface, name, index, salary, status = BlockStatus.ENABLED):

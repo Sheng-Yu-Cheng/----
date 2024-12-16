@@ -20,7 +20,8 @@ class Game:
             stock_transaction_background_image: pygame.Surface,
             prop_section_background_image: pygame.Surface, 
             block_icons: List[pygame.Surface], 
-            all_props_generating_function: List[Prop]
+            all_props_generating_function: List[Prop], 
+            random_event_card_deck: EventCardDeck
         ):
         self.screen_width, self.screen_height = screen_size
         #
@@ -48,6 +49,9 @@ class Game:
         #
         self.dice = Dice()
         self.dice_rolling_counter = 0
+        #
+        self.random_event_card_deck = random_event_card_deck
+        self.done_random_event = False
         #
         self.status = GameStatus.WAIT_FOR_ROLLING_DICE
         #
@@ -82,6 +86,8 @@ class Game:
             self.updatePlayerToken()
         elif self.status == GameStatus.SHOWING_EVENT_CARD:
             self.board.blocks[self.players[self.now_player_index].position].deck.renderToScreen(screen) 
+        elif self.status == GameStatus.SHOWING_RANDOM_EVENT_CARD:
+            self.random_event_card_deck.renderToScreen(screen) 
     def generateCollideRectAndReactFunctionList(self, 
             confirm_function: Callable = lambda: False, 
             cancel_function: Callable = lambda: False, 
@@ -186,6 +192,8 @@ class Game:
                 rect_and_func.append((block.rect, trigger_generator(block)))
         elif self.status == GameStatus.SHOWING_EVENT_CARD:
             rect_and_func.append((pygame.Rect(0, 0, self.screen_width, self.screen_height), self.startExecutingEventCardEffect))
+        elif self.status == GameStatus.SHOWING_RANDOM_EVENT_CARD:
+            rect_and_func.append((pygame.Rect(0, 0, self.screen_width, self.screen_height), self.executeRandomEventCardEffect))    
         self.collide_rect_and_react_func_list = rect_and_func
     
 
@@ -193,6 +201,7 @@ class Game:
 
     # ------------------- END ROUND ---------------------
     def endRound(self):
+        self.done_random_event = False
         self.players[self.now_player_index].invisible_round = False
         self.players[self.now_player_index].identification = -1
         for block in self.board.blocks:
@@ -235,7 +244,8 @@ class Game:
                 player.icon.selected = False
             player.icon.disabled = True
         prop.doEffect(now_block, selected_blocks, self.board, now_player, selected_players, self.players)
-        now_player.props.remove(prop)
+        if prop in now_player.props:
+            now_player.props.remove(prop)
         self.prop_section.updateToPlayer(now_player)
         self.status = game_state
         self.generateCollideRectAndReactFunctionList()
@@ -298,9 +308,14 @@ class Game:
 
     # ------------------- DICE ---------------------
     def startRollDice(self): 
-        self.status = GameStatus.ROLLING_DICE
-        self.dice_rolling_counter = 0
-        self.generateCollideRectAndReactFunctionList()
+        if not self.done_random_event and random.randint(1, 100) >= 95:
+            self.done_random_event = True
+            self.random_event_card_deck.drawCard()
+            self.startShowingRandomEventCard()
+        else:
+            self.status = GameStatus.ROLLING_DICE
+            self.dice_rolling_counter = 0
+            self.generateCollideRectAndReactFunctionList()
     def updateDiceStatus(self):
         if self.dice_rolling_counter % 10 == 0:
             self.dice.rollDice()
@@ -369,15 +384,17 @@ class Game:
                         lambda block, y, z, w: block.type != BlockType.AIRPORT, 
                         1, 
                         False,
-                        lambda x, y, z: False, 
+                        lambda w, x, y, z: False, 
                         0, 
                         updateAirportSelection
                     )
-                    self.startPropSelection(self.status, airport)
+                    self.startPropSelection(GameStatus.WAIT_FOR_TRANSACTIONS, airport)
                 elif now_block.type == BlockType.PROP_BLOCK:
                     if len(now_player.props) < 4:
                         shuffle(self.all_props_generating_function)
                         now_player.props.append(self.all_props_generating_function[0]())
+                        self.prop_section.updateToPlayer(now_player)
+                    self.startTransactionState()
                 elif now_block.type == BlockType.HARBOR:
                     def harborEvent(block, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players, players):
                         if randint(1, 100) > 60:
@@ -389,7 +406,8 @@ class Game:
                             bread_stores = 0
                             for block in self.board.blocks:
                                 if isinstance(block, BreadStoreBlock) and block.owner == now_player:
-                                    now_player.balance += randint(8000, 30000) * (1 << bread_stores)
+                                    bread_stores += 1
+                            now_player.balance += randint(8000, 30000) * (1 << bread_stores)
                     harbor = Prop(
                         "Harbor", 
                         pygame.Surface((1, 1)), 
@@ -397,11 +415,11 @@ class Game:
                         lambda w, x, y, z: False, 
                         0, 
                         False,
-                        lambda x, y, z: False, 
+                        lambda w, x, y, z: False, 
                         0, 
                         harborEvent
                     )
-                    self.startPropSelection(self.status, harbor)                    
+                    self.startPropSelection(GameStatus.WAIT_FOR_TRANSACTIONS, harbor)                    
                 elif now_block.type == BlockType.RENOVATION_COMPARY:
                     def renovation(block, selected_blocks: List[BLOCK], board, now_player: Player, selected_players, players):
                         if len(selected_blocks) == 1:
@@ -416,15 +434,26 @@ class Game:
                             block.owner != None, 
                         1, 
                         False,
-                        lambda x, y, z: False, 
+                        lambda w, x, y, z: False, 
                         0, 
                         renovation
                     )
-                    self.startPropSelection(self.status, renovation_company)
+                    self.startPropSelection(GameStatus.WAIT_FOR_TRANSACTIONS, renovation_company)
                 else:
                     self.startTransactionState()
         self.player_token_moving_counter += 1
     
+    # ----------------- RANDOM EVENT CARD ----------------
+    def startShowingRandomEventCard(self):
+        self.status = GameStatus.SHOWING_RANDOM_EVENT_CARD
+        self.generateCollideRectAndReactFunctionList()
+    def executeRandomEventCardEffect(self):
+        now_player = self.players[self.now_player_index]
+        now_block = self.board.blocks[now_player.position]
+        now_card = self.random_event_card_deck.now_card
+        now_card.doEffect(now_block, [], self.board, now_player, [], self.players)
+        now_card = self.random_event_card_deck.now_card = None
+        self.startRollDice()
 
     # ------------------- EVENT CARD ---------------------
     def startShowingEventCard(self):
@@ -528,7 +557,11 @@ class Game:
                         self.players[now_block.owner].balance += now_block.rent_chart[possessed_utility_amount - 1]
         elif isinstance(now_block, BreadStoreBlock):
             if now_block.owner == None:
+                self.action_menu.buy_button_disabled = False
+            elif now_block.owner != now_player.index:
                 self.action_menu.buy_button_disabled = True
+        else:
+            self.action_menu.buy_button_disabled = True
         self.action_menu.updateWithPlayer(now_player)
     
 
@@ -564,7 +597,7 @@ class Game:
     def buyNowBlock(self):
         now_player = self.players[self.now_player_index]
         now_block = self.board.blocks[now_player.position]
-        if now_player.bought_this_round or not isinstance(now_block, PROPERTY_BLCOK):
+        if now_player.bought_this_round or not isinstance(now_block, (PROPERTY_BLCOK, BreadStoreBlock)):
             return
         if now_block.status & BlockStatus.OWNED and now_block.owner == self.now_player_index:
             if now_block.house_amount < 5 and now_player.balance >= now_block.house_price_chart[now_block.house_amount]:

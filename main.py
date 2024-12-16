@@ -17,6 +17,7 @@ while running:
                 if rect.collidepoint(event.pos):
                     trigger()
     game.handleBlockInformationShowing(pygame.mouse.get_pos())
+    screen.fill((0, 0, 0))
     game.renderToScreen(screen)
     pygame.display.flip()
 

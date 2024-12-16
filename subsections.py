@@ -109,8 +109,12 @@ class BlockInformation:
         self.block_rents_rects: List[pygame.Rect] = [pygame.Rect(0, 0, 0, 0) for i in range(6)]
         for i, rect in enumerate(self.block_rents_rects):
             rect.topleft = addCoordinates(self.window_rect.topleft, (5, 185 + 20 * i))
-        #
+        ######
+        self.block_now_house_amount = HUNINN18.render("", 1, "#000000")
+        self.block_now_house_amount_rect = pygame.Rect(0, 0, 0, 0)
+        self.block_now_house_amount_rect.topleft = addCoordinates(self.window_rect.topleft, (5, 325))
     def updateToBlock(self, block: BLOCK, player_list: List[Player]):
+        self.block_now_house_amount = HUNINN18.render("", 1, "#000000")
         if block == None:
             self.block_description_lines = 0
             self.block_name = COMIC_SANS18.render("", 1, "#000000")
@@ -123,14 +127,19 @@ class BlockInformation:
             owner = player_list[block.owner].name if block.owner != None else None
             self.block_owner = COMIC_SANS18.render(f"Owner: {owner}", 1, "#000000")
             self.block_rents_amount = self.block_purchase_prices_amount = 6
+            if block.house_amount == 0:
+                self.block_now_house_amount = HUNINN18.render(f"目前沒有房子", 1, "#000000")
+            elif block.house_amount == 5:
+                self.block_now_house_amount = HUNINN18.render(f"目前有一棟旅館", 1, "#000000")
+            else:
+                self.block_now_house_amount = HUNINN18.render(f"目前房子數量：{block.house_amount}", 1, "#000000")
+            self.block_purchase_prices[0] = HUNINN18.render(f"空地：{block.purchase_price}", 1, "#000000")
             chart = block.house_price_chart
             for i, value in enumerate(chart):
-                if i == 0:
-                    self.block_purchase_prices[i] = HUNINN18.render(f"空地：{value}", 1, "#000000")
-                elif i == 5:
-                    self.block_purchase_prices[i] = HUNINN18.render(f"旅館：{value}", 1, "#000000")
+                if i == 4:
+                    self.block_purchase_prices[i + 1] = HUNINN18.render(f"旅館：{value}", 1, "#000000")
                 else:
-                    self.block_purchase_prices[i] = HUNINN18.render(f"第{i}棟房子：{value}", 1, "#000000")
+                    self.block_purchase_prices[i + 1] = HUNINN18.render(f"第{i + 1}棟房子：{value}", 1, "#000000")
             chart = block.rent_chart
             for i, value in enumerate(chart):
                 if i == 0:
@@ -163,7 +172,19 @@ class BlockInformation:
             chart = block.rent_chart
             for i, value in enumerate(chart):
                 self.block_rents[i] = HUNINN18.render(f"{i + 1}個電力公司：{value}", 1, "#000000")
+        elif block.type == BlockType.BREAD_STORE:
+            self.block_description_lines = 0
+            self.block_name = COMIC_SANS18.render(block.name, 1, "#000000")
+            owner = player_list[block.owner].name if block.owner != None else None
+            self.block_owner = COMIC_SANS18.render(f"Owner: {owner}", 1, "#000000")
+            self.block_purchase_prices_amount = 1
+            self.block_purchase_prices[0] = HUNINN18.render(f"購買價格：{block.purchase_price}", 1, "#000000")
+            self.block_rents_amount = 1
+            self.block_rents[0] = HUNINN18.render("可惜只能做麵包，沒租金", 1, "#000000")
         else:
+            self.block_purchase_prices_amount = self.block_rents_amount = 0
+            self.block_name = COMIC_SANS18.render(block.name, 1, "#000000")
+            self.block_owner = COMIC_SANS18.render("", 1, "#000000")
             if block.type == BlockType.HARBOR:
                 description = "命運與風險交織的邊緣地帶，玩家可選擇走私物品，有機率大賺或被抓進監獄，有機率獲得手槍卡。"
                 i, j, self.block_description_lines = 0, 10, 0
@@ -212,9 +233,22 @@ class BlockInformation:
                     self.block_description_lines += 1
                     i += 10
                     j += 10
-            self.block_name = COMIC_SANS18.render(block.name, 1, "#000000")
-            self.block_owner = COMIC_SANS18.render("", 1, "#000000")
-            self.block_purchase_prices_amount = self.block_rents_amount = 0
+            elif block.type == BlockType.PROP_BLOCK:
+                description = "道具狂熱！"
+                i, j, self.block_description_lines = 0, 10, 0
+                while i < len(description):
+                    self.block_descriptions[self.block_description_lines] = HUNINN18.render(description[i:min(j, len(description))], 1, "#000000")
+                    self.block_description_lines += 1
+                    i += 10
+                    j += 10
+            elif block.type == BlockType.TAX:
+                description = "抽稅囉！"
+                i, j, self.block_description_lines = 0, 10, 0
+                while i < len(description):
+                    self.block_descriptions[self.block_description_lines] = HUNINN18.render(description[i:min(j, len(description))], 1, "#000000")
+                    self.block_description_lines += 1
+                    i += 10
+                    j += 10
     def renderToScreen(self, screen: pygame.Surface):
         screen.blit(self.window, self.window_rect)
         screen.blit(self.block_name, self.block_name_rect)
@@ -225,6 +259,7 @@ class BlockInformation:
             screen.blit(self.block_purchase_prices[i], self.block_purchase_prices_rects[i])
         for i in range(self.block_rents_amount):
             screen.blit(self.block_rents[i], self.block_rents_rects[i])
+        screen.blit(self.block_now_house_amount, self.block_now_house_amount_rect)
         
 
 class BoardCenter:
@@ -394,7 +429,7 @@ class PropsSection:
         self.props_list: List[Prop] = []
         self.props_list_topleft: List[Tuple[int]] = []
         for i in range(0, self.prop_amount_limit):
-            self.props_list_topleft.append((i * 240, 0))
+            self.props_list_topleft.append(((i % 2) * 250, (i >> 1) * 240))
     def updateToPlayer(self, player: Player):
         self.props_list = player.props
         for i, prop in enumerate(self.props_list):

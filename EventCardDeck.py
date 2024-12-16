@@ -1,5 +1,6 @@
 from typing import List, Callable
 from random import randint
+from utilities import *
 import pygame
 
 class EventCard:
@@ -49,5 +50,4 @@ class EventCardDeck:
                 L = M + 1
         self.now_card = self.deck[R] if self.weight_prefix_sum[R] <= random_value else self.deck[L]
     def renderToScreen(self, screen: pygame.Surface):
-        screen.blit(self.now_card.image, self.now_card.rect)
-
+        screen.blit(self.now_card.image, (200, 70))
