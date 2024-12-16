@@ -14,6 +14,7 @@ def Pistol() -> Prop:
     return Prop(
         "Pistol", 
         pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/Props/Pistol.jpg"), (180, 240)), 
+        "手槍卡：攻擊選定玩家，造成40點傷害。", 
         need_player_selection = True, 
         player_target_filter = lambda player, board, now_player_index, players: player.index != now_player_index, 
         player_target_maximum = 1, 
@@ -27,6 +28,7 @@ def Barrier() -> Prop:
     return Prop(
         "Barrier", 
         pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/Props/Barrier.jpg"), (180, 240)), 
+        "路障卡：在選定的格子放隱形路障，阻擋下一位進入該格的玩家（包括自己）。", 
         need_block_selection = True, 
         block_target_filter = lambda x, y, z, w: True, 
         block_target_maximum = 1, 
@@ -39,6 +41,7 @@ def Rabbit() -> Prop:
     return Prop(
         "Rabbit", 
         pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/Props/Rabbit.jpg"), (180, 240)), 
+        "兔子卡：下次骰出來的點數效果變成兩倍", 
         effect = rabbit
     )
 
@@ -48,6 +51,7 @@ def Turtle() -> Prop:
     return Prop(
         "Trutle", 
         pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/Props/Turtle.jpg"), (180, 240)), 
+        "烏龜卡：下次骰出來的點數效果變成二分之一倍取下高斯", 
         effect = turtle
     )
 
@@ -57,6 +61,7 @@ def Bomb() -> Prop:
     return Prop(
         "Bomb", 
         pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/Props/Gernade.jpg"), (180, 240)), 
+        "炸彈卡：放一顆隱形炸彈，踩到的人會受到80點傷害", 
         effect = bomb
     )
 
@@ -68,6 +73,7 @@ def Lord() -> Prop:
     return Prop(
         "Lord", 
         pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/Props/Lord.jpg"), (180, 240)), 
+        "地主卡：強制取得一個有產權的格子的所有權", 
         need_block_selection = True, 
         block_target_filter = filter, 
         block_target_maximum = 1, 
@@ -82,6 +88,7 @@ def Digger() -> Prop:
     return Prop(
         "Digger", 
         pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/Props/Digger.jpg"), (180, 240)), 
+        "拆房卡：把一個有房子的格子夷平",
         need_block_selection = True, 
         block_target_filter = filter, 
         block_target_maximum = 1, 
@@ -94,6 +101,7 @@ def Reverse() -> Prop:
     return Prop(
         "Reverse", 
         pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/Props/reverse.jpg"), (180, 240)), 
+        "嫁禍卡：選一個玩家，這回合如果踩到要付過路費的時候變成他付",
         need_player_selection = True, 
         player_target_filter = lambda player, board, now_player_index, players: player.index != now_player_index, 
         player_target_maximum = 1, 

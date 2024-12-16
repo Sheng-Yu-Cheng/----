@@ -6,6 +6,7 @@ class Prop:
     def __init__(self, 
         name: str, 
         image: pygame.Surface,
+        description = "", 
         need_block_selection: bool = False, 
         block_target_filter: Callable = lambda block, board, now_player_index, players: False, 
         block_target_maximum: int = 0, 
@@ -17,6 +18,7 @@ class Prop:
         self.name: str = name
         self.image: pygame.Surface = image
         self.rect: pygame.Rect = self.image.get_rect()
+        self.description = description
         #
         self.disabled = True
         self.disabled_mask = pygame.Surface((self.rect.width, self.rect.height), pygame.SRCALPHA)

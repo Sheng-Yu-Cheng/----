@@ -429,13 +429,45 @@ class PropsSection:
         self.props_list: List[Prop] = []
         self.props_list_topleft: List[Tuple[int]] = []
         for i in range(0, self.prop_amount_limit):
-            self.props_list_topleft.append(((i % 2) * 250, (i >> 1) * 240))
+            self.props_list_topleft.append((20 + (i % 2) * 200, 30 + (i >> 1) * 240))
+        #
+        self.on_viewing_prop_index = -1
+        self.prop_info_mask = pygame.Surface((180, 240))
+        self.prop_info_mask.fill((255, 255, 255))
+        self.prop_info_lines = 0
+        self.prop_info: List[pygame.Surface] = [HUNINN18.render("", 1, "#000000") for _ in range(10)]
+        self.prop_info_rects: List[pygame.Rect] = [pygame.Rect(0, 0, 3, 3 + 20 * i) for i in range(10)]
+
     def updateToPlayer(self, player: Player):
         self.props_list = player.props
         for i, prop in enumerate(self.props_list):
             prop.setTopleft(addCoordinates(self.window_rect.topleft, self.props_list_topleft[i]))
+    def updateToPropInfo(self, prop_info):
+        i, j, self.prop_info_lines = 0, 10, 0
+        while i < len(prop_info):
+            self.prop_info[self.prop_info_lines] = HUNINN18(prop_info[i:min(j,len(prop_info))], 1, '#000000')
+            i += 10
+            j += 10
+            self.prop_info_lines += 1
+    def handleMousePosition(self, mouse_pos):
+        new_collide = -1
+        for i, prop in enumerate(self.props_list):
+            if prop.rect.collidepoint(mouse_pos):
+                new_collide = i
+        if new_collide != self.on_viewing_prop_index:
+            self.on_viewing_prop_index = new_collide
+            if self.on_viewing_prop_index != -1:
+                self.updateToPlayer(self.props_list[i].description)
+            
+            
     def renderToScreen(self, screen: pygame.Surface):
         screen.blit(self.window, self.window_rect)
-        for prop in self.props_list:
-            prop.renderToScreen(screen)
+        for i, prop in enumerate(self.props_list):
+            if self.on_viewing_prop_index == i:
+                screen.blit(self.prop_info_mask, prop.rect)
+                for i in range(self.prop_info_lines):
+                    screen.blit(self.prop_info[i], self.prop_info_rects[i])
+            else:
+                prop.renderToScreen(screen)
+            
     
