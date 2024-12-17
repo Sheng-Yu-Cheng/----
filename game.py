@@ -406,7 +406,7 @@ class Game:
                         if player.index != self.now_player_index:
                             add += int(player.balance) * 0.05
                             player.balance = int(player.balance * 0.95)
-                    self.players[self.now_player_index] += add
+                    self.players[self.now_player_index].balance += add
                     self.startTransactionState()
                 elif now_block.type == BlockType.HARBOR:
                     def harborEvent(block, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players, players):
@@ -614,7 +614,7 @@ class Game:
         now_block = self.board.blocks[now_player.position]
         if now_player.bought_this_round or not isinstance(now_block, (PROPERTY_BLCOK, BreadStoreBlock)):
             return
-        if now_block.status & BlockStatus.OWNED and now_block.owner == self.now_player_index:
+        if now_block.status & BlockStatus.OWNED and now_block.owner == self.now_player_index and isinstance(now_block, StreetBlock):
             if now_block.house_amount < 5 and now_player.balance >= now_block.house_price_chart[now_block.house_amount]:
                 now_player.balance -= now_block.house_price_chart[now_block.house_amount]
                 now_block.house_amount += 1
