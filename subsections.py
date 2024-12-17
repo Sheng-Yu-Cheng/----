@@ -194,7 +194,7 @@ class BlockInformation:
                     i += 10
                     j += 10
             elif block.type == BlockType.AIRPORT:
-                description = "登上飛機，快速穿梭各地，助你搶占先機！但高空旅行總是充滿未知，風險與機遇並存，做好準備再啟程吧！"
+                description = "登上飛機，快速穿梭各地，助你搶占先機！但高空旅行總是充滿未知，做好準備再啟程吧！"
                 i, j, self.block_description_lines = 0, 10, 0
                 while i < len(description):
                     self.block_descriptions[self.block_description_lines] = HUNINN18.render(description[i:min(j, len(description))], 1, "#000000")
@@ -242,7 +242,7 @@ class BlockInformation:
                     i += 10
                     j += 10
             elif block.type == BlockType.TAX:
-                description = "抽稅囉！"
+                description = "抓到你囉!"
                 i, j, self.block_description_lines = 0, 10, 0
                 while i < len(description):
                     self.block_descriptions[self.block_description_lines] = HUNINN18.render(description[i:min(j, len(description))], 1, "#000000")
@@ -457,7 +457,7 @@ class PropsSection:
         if new_collide != self.on_viewing_prop_index:
             self.on_viewing_prop_index = new_collide
             if self.on_viewing_prop_index != -1:
-                self.updateToPropInfo(self.props_list[i].description)
+                self.updateToPropInfo(self.props_list[self.on_viewing_prop_index].description)
             
             
     def renderToScreen(self, screen: pygame.Surface):

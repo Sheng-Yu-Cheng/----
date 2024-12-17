@@ -556,10 +556,10 @@ def generateGame() -> Game:
         PlayerIcon(pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/PlayerIcons/pop.jpg"), (100, 100)), (535, 105))
     ]
     players = [
-        Player("Alice", 0, player_token[0], player_icons[0], StockMarketAccount(market), [Barrier() for _ in range(4)], balance = 25000, health_point = 100), 
-        Player("Bob", 1, player_token[1], player_icons[1], StockMarketAccount(market), [Barrier() for _ in range(4)], balance = 25000, health_point = 100), 
-        Player("Sean", 2, player_token[2], player_icons[2], StockMarketAccount(market), [Barrier() for _ in range(4)], balance = 25000, health_point = 100), 
-        Player("Andrew", 3, player_token[3], player_icons[3], StockMarketAccount(market), [Barrier() for _ in range(4)], balance = 25000, health_point = 100)
+        Player("Player 1", 0, player_token[0], player_icons[0], StockMarketAccount(market), [Rabbit(), Turtle()], balance = 25000, health_point = 100), 
+        Player("Player 2", 1, player_token[1], player_icons[1], StockMarketAccount(market), [Rabbit(), Turtle()], balance = 25000, health_point = 100), 
+        Player("Player 3", 2, player_token[2], player_icons[2], StockMarketAccount(market), [Rabbit(), Turtle()], balance = 25000, health_point = 100), 
+        Player("Player 4", 3, player_token[3], player_icons[3], StockMarketAccount(market), [Rabbit(), Turtle()], balance = 25000, health_point = 100)
     ]
     game = Game(
         (1280, 720), 

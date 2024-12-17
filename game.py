@@ -400,6 +400,14 @@ class Game:
                         now_player.props.append(self.all_props_generating_function[0]())
                         self.prop_section.updateToPlayer(now_player)
                     self.startTransactionState()
+                elif now_block.type == BlockType.TAX:
+                    add = 0
+                    for player in self.players:
+                        if player.index != self.now_player_index:
+                            add += int(player.balance) * 0.05
+                            player.balance = int(player.balance * 0.95)
+                    self.players[self.now_player_index] += add
+                    self.startTransactionState()
                 elif now_block.type == BlockType.HARBOR:
                     def harborEvent(block, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players, players):
                         if randint(1, 100) > 60:

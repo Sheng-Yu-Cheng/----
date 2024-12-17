@@ -11,7 +11,7 @@ class EventCard:
             block_target_filter: Callable = lambda x, y, z, w: False, 
             block_target_maxmium: int = 0, 
             need_player_selection: bool = False, 
-            player_target_filter: Callable = lambda x, y, z: False,
+            player_target_filter: Callable = lambda x, y, z, w: False,
             player_target_maxmimum: int = 0, 
             effect: Callable = lambda: None
         ):
