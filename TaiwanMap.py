@@ -267,7 +267,7 @@ def generateGame() -> Game:
         now_block = board.blocks[board.prison_block_index]
         now_player.stop_round = 3
         now_player.token.rect.topleft = addCoordinates(now_block.rect.center, TOKEN_OFFSET[now_player.index])
-    community_chest_deck_list.append(EventCard(image_17, 10, need_player_selection=True, player_target_filter= lambda w, x, y, z: True,player_target_maxmimum=1 , effect=reporter))
+    community_chest_deck_list.append(EventCard(image_17, 10, need_player_selection=True, player_target_filter= lambda player, board, now_player_index, players: player.index != now_player_index,player_target_maximum=1 , effect=reporter))
 
     # 魔法小卡
     image_18 = pygame.transform.scale(pygame.image.load("Assets/EventCards/CommunityChest/魔法小卡.jpg"), (400, 580))
