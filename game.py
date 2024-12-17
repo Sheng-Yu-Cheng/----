@@ -354,7 +354,7 @@ class Game:
             now_player = self.players[self.now_player_index]
             now_player.token_position += 1
             if now_player.token_position == self.block_amount:
-                now_player += self.board.blocks[0].salary
+                now_player.balance += self.board.blocks[0].salary
             now_player.token_position %= self.block_amount
             #
             now_block = self.board.blocks[now_player.token_position]
