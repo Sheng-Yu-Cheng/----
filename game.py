@@ -353,7 +353,7 @@ class Game:
         if self.player_token_moving_counter % 10 == 0:
             now_player = self.players[self.now_player_index]
             now_player.token_position += 1
-            if now_player.position == self.block_amount:
+            if now_player.token_position == self.block_amount:
                 now_player += self.board.blocks[0].salary
             now_player.token_position %= self.block_amount
             #
@@ -404,7 +404,7 @@ class Game:
                     add = 0
                     for player in self.players:
                         if player.index != self.now_player_index:
-                            add += int(player.balance) * 0.05
+                            add += int(player.balance * 0.05)
                             player.balance = int(player.balance * 0.95)
                     self.players[self.now_player_index].balance += add
                     self.startTransactionState()
