@@ -64,7 +64,7 @@ class Player:
         self.token = token
         self.token_position = position
         self.bought_this_round = False
-        self.health_points_text = COMIC_SANS18.render(f"{self.health_points}/100", 1, "#000000")
+        self.health_points_text = COMIC_SANS18.render(f"{self.health_points}/100", 1, "#FFFFFF")
     def decreaseHealthPoint(self, amount):
         self.health_points -= amount
         if self.health_points <= 0:

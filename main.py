@@ -21,8 +21,13 @@ while running:
     game.handlePropInformationShowing(mouse_pos)
     screen.fill((0, 0, 0))
     game.renderToScreen(screen)
+    if game.game_over:
+        screen.fill((0, 0, 0))
+        HUNINN50.render(f"遊戲結束，玩家{game.now_player_index}輸了", 1, "#FFFFFF")
+        running = False   
     pygame.display.flip()
-
     clock.tick(60)
 
+
+clock.tick(5000)
 pygame.quit() 

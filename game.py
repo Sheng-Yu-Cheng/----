@@ -43,6 +43,7 @@ class Game:
         self.previous_showing_block_info_index = -1
         #
         self.showing_prop_section = True
+        self.game_over = False
         #
         self.selected_blocks: List[Block] = []
         self.selected_players: List[Player] = []
@@ -204,6 +205,8 @@ class Game:
         self.done_random_event = False
         self.players[self.now_player_index].invisible_round = False
         self.players[self.now_player_index].identification = -1
+        if self.players[self.now_player_index].balance < 0:
+            self.game_over = True
         for block in self.board.blocks:
             if isinstance(block, PROPERTY_BLCOK) and block.rent_disabled_round > 0:
                 block.rent_disabled_round -= 1
@@ -225,7 +228,6 @@ class Game:
         else:
             self.status = GameStatus.WAIT_FOR_ROLLING_DICE
             self.generateCollideRectAndReactFunctionList()
-    
 
     # ------------------- PROPS ------------------------
     def executePropEffectAndGoBackToGameState(self, game_state, prop: Prop):
