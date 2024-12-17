@@ -9,7 +9,7 @@ class EventCard:
             weight: int, 
             need_block_selection: bool = False, 
             block_target_filter: Callable = lambda x, y, z, w: False, 
-            block_target_maxmium: int = 0, 
+            block_target_maximum: int = 0, 
             need_player_selection: bool = False, 
             player_target_filter: Callable = lambda x, y, z, w: False,
             player_target_maximum: int = 0, 
@@ -21,7 +21,7 @@ class EventCard:
         #
         self.need_block_selection = need_block_selection
         self.block_target_filter = block_target_filter
-        self.block_target_maxmium = block_target_maxmium
+        self.block_target_maximum = block_target_maximum
         self.need_player_selection = need_player_selection
         self.player_target_filter = player_target_filter
         self.player_target_maximum = player_target_maximum
