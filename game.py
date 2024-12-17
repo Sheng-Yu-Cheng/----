@@ -310,7 +310,7 @@ class Game:
 
     # ------------------- DICE ---------------------
     def startRollDice(self): 
-        if not self.done_random_event and random.randint(1, 100) >= 0:
+        if not self.done_random_event and random.randint(1, 100) >= 80:
             self.done_random_event = True
             self.random_event_card_deck.drawCard()
             self.startShowingRandomEventCard()

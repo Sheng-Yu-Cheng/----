@@ -170,13 +170,13 @@ def generateGame() -> Game:
         now_block = board.blocks[board.prison_block_index]
         now_player.stop_round = 3
         now_player.token.rect.topleft = addCoordinates(now_block.rect.center, TOKEN_OFFSET[now_player.index])
-    chance_card_deck_list.append(EventCard(image_3, 10, effect=kP))
+    chance_card_deck_list.append(EventCard(image_3, 5, effect=kP))
 
     # 外星人
     image_4 = pygame.transform.scale(pygame.image.load("Assets/EventCards/Chance/外星人.jpg"), (400, 580))
     def aliens(block: BLOCK, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players: List[Player], players: list[Player]):
         now_player.stop_round = 1
-    chance_card_deck_list.append(EventCard(image_4, 5, effect=aliens))
+    chance_card_deck_list.append(EventCard(image_4, 10, effect=aliens))
 
     # 快不行了
     image_5 = pygame.transform.scale(pygame.image.load("Assets/EventCards/Chance/快不行了.jpg"), (400, 580))
@@ -196,19 +196,19 @@ def generateGame() -> Game:
         selected_blocks[0].owner = now_player.index
     def hogRiderBlockTargetFilter(block, board, now_player_index, players):
         return isinstance(block, BLOCK) and block.owner != now_player_index
-    chance_card_deck_list.append(EventCard(image_7, 5, need_block_selection=True, block_target_filter = hogRiderBlockTargetFilter, block_target_maxmium=1, effect=hogRider))
+    chance_card_deck_list.append(EventCard(image_7, 2, need_block_selection=True, block_target_filter = hogRiderBlockTargetFilter, block_target_maxmium=1, effect=hogRider))
 
     # 撿到錢包
     image_8 = pygame.transform.scale(pygame.image.load("Assets/EventCards/Chance/撿到錢包.jpg"), (400, 580))
     def aWallet(block: BLOCK, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players: List[Player], players: list[Player]):
         now_player.balance += 1000
-    chance_card_deck_list.append(EventCard(image_8, 8, effect=aWallet))
+    chance_card_deck_list.append(EventCard(image_8, 10, effect=aWallet))
 
     # 幫幫人民的啦
     image_9 = pygame.transform.scale(pygame.image.load("Assets/EventCards/Chance/幫幫人民的啦.jpg"), (400, 580))
     def giveMoney(block: BLOCK, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players: List[Player], players: list[Player]):
         now_player.balance -= 1000
-    chance_card_deck_list.append(EventCard(image_9, 8, effect=giveMoney))
+    chance_card_deck_list.append(EventCard(image_9, 10, effect=giveMoney))
 
     # chill guy
     image_10 = pygame.transform.scale(pygame.image.load("Assets/EventCards/chance/chill guy.jpg"), (400, 580))
@@ -224,7 +224,7 @@ def generateGame() -> Game:
     def explosion(block: BLOCK, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players: List[Player], players: list[Player]):
         for blk in board.blocks:
             blk.house_amount = 0
-    community_chest_deck_list.append(EventCard(image_11, 2, effect=explosion))
+    community_chest_deck_list.append(EventCard(image_11, 3, effect=explosion))
 
     # 月光刑警
     image_12 = pygame.transform.scale(pygame.image.load("Assets/EventCards/CommunityChest/月光刑警.jpg"), (400, 580))
@@ -234,31 +234,31 @@ def generateGame() -> Game:
         now_player.token.rect.topleft = addCoordinates(now_block.rect.center, TOKEN_OFFSET[now_player.index])
     def moonlightPowerBlockTargetFilter(block, board, now_player_index, players):
         return True
-    community_chest_deck_list.append(EventCard(image_12, 5, need_block_selection=True, block_target_filter=moonlightPowerBlockTargetFilter, block_target_maxmium=1 , effect=moonlightPower))
+    community_chest_deck_list.append(EventCard(image_12, 10, need_block_selection=True, block_target_filter=moonlightPowerBlockTargetFilter, block_target_maxmium=1 , effect=moonlightPower))
 
     # 出車禍
     image_13 = pygame.transform.scale(pygame.image.load("Assets/EventCards/CommunityChest/出車禍.jpg"), (400, 580))
     def michael(block: BLOCK, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players: List[Player], players: list[Player]):
         now_player.stop_round = 2
-    community_chest_deck_list.append(EventCard(image_13, 5, effect=michael))
+    community_chest_deck_list.append(EventCard(image_13, 20, effect=michael))
 
     # 好友基德
     image_14 = pygame.transform.scale(pygame.image.load("Assets/EventCards/CommunityChest/好友基德.jpg"), (400, 580))
     def goodFreind(block: BLOCK, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players: List[Player], players: list[Player]):
-        now_player.balance += randint(10000, 20000)
-    community_chest_deck_list.append(EventCard(image_14, 5, effect=goodFreind))
+        now_player.balance += randint(7000, 15000)
+    community_chest_deck_list.append(EventCard(image_14, 20, effect=goodFreind))
 
     # 凍蒜
     image_15 = pygame.transform.scale(pygame.image.load("Assets/EventCards/CommunityChest/凍蒜.jpg"), (400, 580))
     def tiKoLiang(block: BLOCK, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players: List[Player], players: list[Player]):
-        now_player.balance += randint(5000, 25000)
-    community_chest_deck_list.append(EventCard(image_15, 3, effect=tiKoLiang))
+        now_player.balance += randint(7000, 15000)
+    community_chest_deck_list.append(EventCard(image_15, 20, effect=tiKoLiang))
 
     # 跌價妖怪女
     image_16 = pygame.transform.scale(pygame.image.load("Assets/EventCards/CommunityChest/跌價妖怪女.jpg"), (400, 580))
     def Ume(block: BLOCK, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players: List[Player], players: list[Player]):
         now_player.balance >>= 1
-    community_chest_deck_list.append(EventCard(image_16, 4, effect=Ume))
+    community_chest_deck_list.append(EventCard(image_16, 20, effect=Ume))
 
     # 檢舉達人
     image_17 = pygame.transform.scale(pygame.image.load("Assets/EventCards/CommunityChest/檢舉達人.jpg"), (400, 580))
@@ -267,13 +267,13 @@ def generateGame() -> Game:
         now_block = board.blocks[board.prison_block_index]
         now_player.stop_round = 3
         now_player.token.rect.topleft = addCoordinates(now_block.rect.center, TOKEN_OFFSET[now_player.index])
-    community_chest_deck_list.append(EventCard(image_17, 3, need_player_selection=True, player_target_filter= lambda x, y, z: True,player_target_maxmimum=1 , effect=reporter))
+    community_chest_deck_list.append(EventCard(image_17, 10, need_player_selection=True, player_target_filter= lambda x, y, z: True,player_target_maxmimum=1 , effect=reporter))
 
     # 魔法小卡
     image_18 = pygame.transform.scale(pygame.image.load("Assets/EventCards/CommunityChest/魔法小卡.jpg"), (400, 580))
     def creditCard(block: BLOCK, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players: List[Player], players: list[Player]):
         now_player.props.append(CreditCard())
-    community_chest_deck_list.append(EventCard(image_18, 3, effect=creditCard))
+    # community_chest_deck_list.append(EventCard(image_18, 3, effect=creditCard))
 
     # gg
     image_19 = pygame.transform.scale(pygame.image.load("Assets/EventCards/CommunityChest/gg.jpg"), (400, 580))
@@ -284,7 +284,7 @@ def generateGame() -> Game:
                 blk.house_amount = 0
         now_player.balance = 25000
         now_player.props.clear()
-    community_chest_deck_list.append(EventCard(image_19, 3, effect=goodGame))
+    community_chest_deck_list.append(EventCard(image_19, 2, effect=goodGame))
 
     chance_card_deck = EventCardDeck(chance_card_deck_list)
     community_chest_deck = EventCardDeck(community_chest_deck_list)
@@ -295,13 +295,13 @@ def generateGame() -> Game:
     icons = []
     #####
     go_image = pygame.image.load("Assets/TaiwanBoard/Blocks/start.png")
-    go = StartBlock(pygame.transform.scale(go_image, (80, 80)), "Go", 0, 200)
+    go = StartBlock(pygame.transform.scale(go_image, (80, 80)), "Go", 0, 2000)
     go.rect.topleft = (640, 640)
     icons.append(pygame.transform.scale(go_image, (300, 300)))
     board.addBlock(go)
     #
     keelung_image = pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/Keelung.jpg"), -90)
-    keelung = StreetBlock(pygame.transform.scale(keelung_image, (60, 80)), "Keelung", 1, 60, 30, [100, 100, 100, 100, 100], [20, 50, 80, 110, 200, 500], "red",0)
+    keelung = StreetBlock(pygame.transform.scale(keelung_image, (60, 80)), "Keelung", 1, 2000, 30, [2400, 2400, 2400, 2400, 2400], [500 + i * 600 for i in range(6)], "red", 0)
     keelung.rect.topleft = (580,640)
     icons.append(pygame.transform.scale(keelung_image, (300, 400)))
     board.addBlock(keelung)
@@ -313,25 +313,25 @@ def generateGame() -> Game:
     board.addBlock(commuity_chest1)
     #
     guishan_island_image = pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/GuishanIsland.jpg"), -90)
-    guishan_island = StreetBlock(pygame.transform.scale(guishan_island_image, (60, 80)), "Guishan Island", 3, 60, 30, [100, 100, 100, 100, 100], [20, 50, 80, 110, 200, 500], "red",0)
+    guishan_island = StreetBlock(pygame.transform.scale(guishan_island_image, (60, 80)), "Guishan Island", 3, 2100, 30, [2400, 2400, 2400, 2400, 2400], [525 + i * 600 for i in range(6)], "red",0)
     guishan_island.rect.topleft = (460,640)
     icons.append(pygame.transform.scale(guishan_island_image, (300, 400)))
     board.addBlock(guishan_island)
     #####
     income_tax_image = pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/Taxation.jpg"), -90)
-    income_tax = IncomeTaxBlock(pygame.transform.scale(income_tax_image, (60, 80)), "Tax", 4, 200)
+    income_tax = IncomeTaxBlock(pygame.transform.scale(income_tax_image, (60, 80)), "Tax", 4, 1000)
     income_tax.rect.topleft = (400, 640)
     icons.append(pygame.transform.scale(income_tax_image, (300, 400)))
     board.addBlock(income_tax)
     #####
     station1_image = pygame.image.load("Assets/TaiwanBoard/Blocks/Railroad1.png")
-    station1 = RailroadBlock(pygame.transform.scale(station1_image, (60, 80)), "Station 1", 5, 200, 100, [50, 100, 200, 400])
+    station1 = RailroadBlock(pygame.transform.scale(station1_image, (60, 80)), "Station 1", 5, 1500, 100, [500, 1500, 3000, 6000])
     station1.rect.topleft = (340, 640)
     icons.append(pygame.transform.scale(station1_image, (300, 400)))
     board.addBlock(station1)
     #
     yilan_image = pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/Yilan.jpg"), -90)
-    yilan = StreetBlock(pygame.transform.scale(yilan_image, (60, 80)), "Yilan", 6, 60, 30, [100, 100, 100, 100, 100], [20, 50, 80, 110, 200, 500], "red",0)
+    yilan = StreetBlock(pygame.transform.scale(yilan_image, (60, 80)), "Yilan", 6, 2400, 30, [2400, 2400, 2400, 2400, 2400], [600 + i * 600 for i in range(6)], "red",0)
     yilan.rect.topleft = (280,640)
     icons.append(pygame.transform.scale(yilan_image, (300, 400)))
     board.addBlock(yilan)
@@ -343,55 +343,55 @@ def generateGame() -> Game:
     board.addBlock(chance1)
     #
     hualien_image = pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/Hualien.jpg"), -90)
-    hualien = StreetBlock(pygame.transform.scale(hualien_image, (60, 80)), "Hualien", 8, 60, 30, [100, 100, 100, 100, 100], [20, 50, 80, 110, 200, 500], "red",0)
+    hualien = StreetBlock(pygame.transform.scale(hualien_image, (60, 80)), "Hualien", 8, 2800, 30, [2400, 2400, 2400, 2400, 2400], [700 + i * 600 for i in range(6)], "red",0)
     hualien.rect.topleft = (160,640)
     icons.append(pygame.transform.scale(hualien_image, (300, 400)))
     board.addBlock(hualien)
     #
     taitung_image = pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/Taitung.jpg"), -90)
-    taitung = StreetBlock(pygame.transform.scale(taitung_image, (60, 80)), "Taitung", 9, 60, 30, [100, 100, 100, 100, 100], [20, 50, 80, 110, 200, 500], "red",0)
+    taitung = StreetBlock(pygame.transform.scale(taitung_image, (60, 80)), "Taitung", 9, 2600, 30, [2400, 2400, 2400, 2400, 2400], [650 + i * 600 for i in range(6)], "red",0)
     taitung.rect.topleft = (100,640)
     icons.append(pygame.transform.scale(taitung_image, (300, 400)))
     board.addBlock(taitung)
     #####
     in_jail_or_just_visit_image = pygame.image.load("Assets/TaiwanBoard/Blocks/jail.png")
-    in_jail_or_just_visit = InJailOrJustVisitingBlock(pygame.transform.scale(in_jail_or_just_visit_image, (80, 80)), "In Jail/Just Visiting", 10)
+    in_jail_or_just_visit = InJailOrJustVisitingBlock(pygame.transform.scale(in_jail_or_just_visit_image, (80, 80)), "Jail", 10)
     in_jail_or_just_visit.rect.topleft = (20, 640)
     icons.append(pygame.transform.scale(in_jail_or_just_visit_image, (300, 300)))
     board.addBlock(in_jail_or_just_visit)
     #
     orchidisland_image = pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/OrchidIsland.jpg"), 180)
-    orchidisland = StreetBlock(pygame.transform.scale(orchidisland_image, (80, 60)), "Orchid Island", 11, 140, 70, [100, 100, 100, 100, 100], [20, 50, 80, 110, 200, 500], "purple",0)
+    orchidisland = StreetBlock(pygame.transform.scale(orchidisland_image, (80, 60)), "Orchid Island", 11, 2400, 70, [2400, 2400, 2400, 2400, 2400], [600 + i * 600 for i in range(6)], "purple",0)
     orchidisland.rect.topleft = (20, 580)
     icons.append(pygame.transform.scale(pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/OrchidIsland.jpg"), -90), (300, 400)))
     board.addBlock(orchidisland)
     #
     utility1_image = pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/ElectricCompany.jpg"), 180)
-    utility1 = UtilityBlock(pygame.transform.scale(utility1_image, (80, 60)), "Electric Company", 12, 150, 75, [100, 250])
+    utility1 = UtilityBlock(pygame.transform.scale(utility1_image, (80, 60)), "Electric Company", 12, 1500, 75, [1000, 3000])
     utility1.rect.topleft = (20, 520)
     icons.append(pygame.transform.scale(pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/ElectricCompany.jpg"), -90), (300, 400)))
     board.addBlock(utility1)
     #
     pingtung_image = pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/Pingtung.jpg"), 180)
-    pingtung = StreetBlock(pygame.transform.scale(pingtung_image, (80, 60)), "Pingtung", 13, 140, 70, [100, 100, 100, 100, 100], [20, 50, 80, 110, 200, 500], "purple",0)
+    pingtung = StreetBlock(pygame.transform.scale(pingtung_image, (80, 60)), "Pingtung", 13, 2800, 70, [2400, 2400, 2400, 2400, 2400], [700 + i * 600 for i in range(6)], "purple",0)
     pingtung.rect.topleft = (20, 460)
     icons.append(pygame.transform.scale(pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/Pingtung.jpg"), -90), (300, 400)))
     board.addBlock(pingtung)
     #
     kaohsiung_image = pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/Kaohsiung.jpg"), 180)
-    kaohsiung = StreetBlock(pygame.transform.scale(kaohsiung_image, (80, 60)), "Kaohsiung", 14, 160, 80, [100, 100, 100, 100, 100], [20, 50, 80, 110, 200, 500], "purple",0)
+    kaohsiung = StreetBlock(pygame.transform.scale(kaohsiung_image, (80, 60)), "Kaohsiung", 14, 3400, 80, [2400, 2400, 2400, 2400, 2400], [850 + i * 600 for i in range(6)], "purple",0)
     kaohsiung.rect.topleft = (20, 400)
     icons.append(pygame.transform.scale(pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/Kaohsiung.jpg"), -90), (300, 400)))
     board.addBlock(kaohsiung)
     #####
     station2_image = pygame.image.load("Assets/TaiwanBoard/Blocks/Railroad2.png")
-    station2 = RailroadBlock(pygame.transform.scale(pygame.transform.rotate(station2_image, 270), (80, 60)), "Station 2", 15, 200, 100, [50, 100, 200, 400])
+    station2 = RailroadBlock(pygame.transform.scale(pygame.transform.rotate(station2_image, 270), (80, 60)), "Station 2", 15, 1500, 100, [500, 1500, 3000, 6000])
     station2.rect.topleft = (20, 340)
     icons.append(pygame.transform.scale(station2_image, (300, 400)))
     board.addBlock(station2)
     #
     bakery1_image = pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/BakeryShop.png"), 270)
-    bakery1 = BreadStoreBlock(pygame.transform.scale(bakery1_image, (80, 60)), "BakeryShop", 16, 180, 90, [], None, 0)
+    bakery1 = BreadStoreBlock(pygame.transform.scale(bakery1_image, (80, 60)), "BakeryShop", 16, 5000, 90, [], None, 0)
     bakery1.rect.topleft = (20, 280)
     icons.append(pygame.transform.scale(pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/BakeryShop.png"), 0), (300, 400)))
     board.addBlock(bakery1)
@@ -403,7 +403,7 @@ def generateGame() -> Game:
     board.addBlock(commuity_chest2)
     #
     tainan_image = pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/Tainan.jpg"), 180)
-    tainan = StreetBlock(pygame.transform.scale(tainan_image, (80, 60)), "Tainan", 18, 160, 80, [100, 100, 100, 100, 100], [20, 50, 80, 110, 200, 500], "purple",0)
+    tainan = StreetBlock(pygame.transform.scale(tainan_image, (80, 60)), "Tainan", 18, 3300, 80, [2400, 2400, 2400, 2400, 2400], [825 + i * 600 for i in range(6)], "purple",0)
     tainan.rect.topleft = (20, 160)
     icons.append(pygame.transform.scale(pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/Tainan.jpg"), -90), (300, 400)))
     board.addBlock(tainan)
@@ -421,7 +421,7 @@ def generateGame() -> Game:
     board.addBlock(harbor)
     #
     chiayi_image = pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/Chiayi.jpg"), 90)
-    chiayi = StreetBlock(pygame.transform.scale(chiayi_image, (60, 80)), "Chiayi", 21, 160, 80, [100, 100, 100, 100, 100], [20, 50, 80, 110, 200, 500], "purple",0)
+    chiayi = StreetBlock(pygame.transform.scale(chiayi_image, (60, 80)), "Chiayi", 21, 2800, 80, [2400, 2400, 2400, 2400, 2400], [700 + i * 600 for i in range(6)], "purple",0)
     chiayi.rect.topleft = (100, 20)
     icons.append(pygame.transform.scale(pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/Chiayi.jpg"), -90), (300, 400)))
     board.addBlock(chiayi)
@@ -433,19 +433,19 @@ def generateGame() -> Game:
     board.addBlock(chance2)
     #
     sunmoonlake_image = pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/SunMoonLake.jpg"), 90)
-    sunmoonlake = StreetBlock(pygame.transform.scale(sunmoonlake_image, (60, 80)), "Sun Moon Lake", 23, 160, 80, [100, 100, 100, 100, 100], [20, 50, 80, 110, 200, 500], "purple",0)
+    sunmoonlake = StreetBlock(pygame.transform.scale(sunmoonlake_image, (60, 80)), "Sun Moon Lake", 23, 3400, 80, [2400, 2400, 2400, 2400, 2400], [850 + i * 600 for i in range(6)], "purple",0)
     sunmoonlake.rect.topleft = (220, 20)
     icons.append(pygame.transform.scale(pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/SunMoonLake.jpg"), -90), (300, 400)))
     board.addBlock(sunmoonlake)
     #
     bakery2_image = pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/BakeryShop.png"), 180)
-    bakery2 = BreadStoreBlock(pygame.transform.scale(bakery2_image, (60, 80)), "BakeryShop", 24, 180, 90, [0], None, 0)
+    bakery2 = BreadStoreBlock(pygame.transform.scale(bakery2_image, (60, 80)), "BakeryShop", 24, 5000, 90, [0], None, 0)
     bakery2.rect.topleft = (280, 20)
     icons.append(pygame.transform.scale(pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/BakeryShop.png"), 0), (300, 400)))
     board.addBlock(bakery2)
     #####
     station3_image = pygame.image.load("Assets/TaiwanBoard/Blocks/Railroad3.png")
-    station3 = RailroadBlock(pygame.transform.scale(pygame.transform.rotate(station3_image, 180), (60, 80)), "Station 3", 25, 200, 100, [50, 100, 200, 400])
+    station3 = RailroadBlock(pygame.transform.scale(pygame.transform.rotate(station3_image, 180), (60, 80)), "Station 3", 25, 1500, 100, [500, 1500, 3000, 6000])
     station3.rect.topleft = (340, 20)
     icons.append(pygame.transform.scale(station3_image, (300, 400)))
     board.addBlock(station3)
@@ -457,19 +457,19 @@ def generateGame() -> Game:
     board.addBlock(prop2)
     #
     taichung_image = pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/Taichung.jpg"), 90)
-    taichung = StreetBlock(pygame.transform.scale(taichung_image, (60, 80)), "Taichung", 27, 160, 80, [100, 100, 100, 100, 100], [20, 50, 80, 110, 200, 500], "purple",0)
+    taichung = StreetBlock(pygame.transform.scale(taichung_image, (60, 80)), "Taichung", 27, 3600, 80, [2400, 2400, 2400, 2400, 2400], [900 + i * 600 for i in range(6)], "purple",0)
     taichung.rect.topleft = (460, 20)
     icons.append(pygame.transform.scale(pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/Taichung.jpg"), -90), (300, 400)))
     board.addBlock(taichung)
     #
     utility2_image = pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/ElectricCompany.jpg"), 90)
-    utility2 = UtilityBlock(pygame.transform.scale(utility2_image, (60, 80)), "Electric Company", 28, 150, 75, [100, 250])
+    utility2 = UtilityBlock(pygame.transform.scale(utility2_image, (60, 80)), "Electric Company", 28, 1500, 75, [1000, 3000])
     utility2.rect.topleft = (520, 20)
     icons.append(pygame.transform.scale(pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/ElectricCompany.jpg"), -90), (300, 400)))
     board.addBlock(utility2)
     #
     miaoli_image = pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/Miaoli.jpg"), 90)
-    miaoli = StreetBlock(pygame.transform.scale(miaoli_image, (60, 80)), "Miaoli", 29, 160, 80, [100, 100, 100, 100, 100], [20, 50, 80, 110, 200, 500], "purple",0)
+    miaoli = StreetBlock(pygame.transform.scale(miaoli_image, (60, 80)), "Miaoli", 29, 2800, 80, [2400, 2400, 2400, 2400, 2400], [700 + i * 600 for i in range(6)], "purple",0)
     miaoli.rect.topleft = (580, 20)
     icons.append(pygame.transform.scale(pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/Miaoli.jpg"), -90), (300, 400)))
     board.addBlock(miaoli)
@@ -481,13 +481,13 @@ def generateGame() -> Game:
     board.addBlock(airport)
     #
     hsinchu_image = pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/Hsinchu.jpg"), 0)
-    hsinchu = StreetBlock(pygame.transform.scale(hsinchu_image, (80, 60)), "Hsinchu", 31, 160, 80, [100, 100, 100, 100, 100], [20, 50, 80, 110, 200, 500], "purple",0)
+    hsinchu = StreetBlock(pygame.transform.scale(hsinchu_image, (80, 60)), "Hsinchu", 31, 3100, 80, [2400, 2400, 2400, 2400, 2400], [775 + i * 600 for i in range(6)], "purple",0)
     hsinchu.rect.topleft = (640, 100)
     icons.append(pygame.transform.scale(pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/Hsinchu.jpg"), -90), (300, 400)))
     board.addBlock(hsinchu)
     #
     newtaipei_image = pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/NewTaipeiCity.jpg"), 0)
-    newtaipei = StreetBlock(pygame.transform.scale(newtaipei_image, (80, 60)), "New Taipei City", 32, 160, 80, [100, 100, 100, 100, 100], [20, 50, 80, 110, 200, 500], "purple",0)
+    newtaipei = StreetBlock(pygame.transform.scale(newtaipei_image, (80, 60)), "New Taipei City", 32, 3800, 80, [2400, 2400, 2400, 2400, 2400], [950 + i * 600 for i in range(6)], "purple",0)
     newtaipei.rect.topleft = (640, 160)
     icons.append(pygame.transform.scale(pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/NewTaipeiCity.jpg"), -90), (300, 400)))
     board.addBlock(newtaipei)
@@ -499,13 +499,13 @@ def generateGame() -> Game:
     board.addBlock(commuity_chest3)
     #
     taipei_image = pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/Taipei.jpg"), 0)
-    taipei = StreetBlock(pygame.transform.scale(taipei_image, (80, 60)), "Taipei", 34, 160, 80, [100, 100, 100, 100, 100], [20, 50, 80, 110, 200, 500], "purple",0)
+    taipei = StreetBlock(pygame.transform.scale(taipei_image, (80, 60)), "Taipei", 34, 4000, 80, [2400, 2400, 2400, 2400, 2400], [1000 + i * 600 for i in range(6)], "purple",0)
     taipei.rect.topleft = (640, 280)
     icons.append(pygame.transform.scale(pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/Taipei.jpg"), -90), (300, 400)))
     board.addBlock(taipei)
     #####
     station4_image = pygame.image.load("Assets/TaiwanBoard/Blocks/Railroad4.png")
-    station4 = RailroadBlock(pygame.transform.scale(pygame.transform.rotate(station4_image, 90), (80, 60)), "Station 4", 35, 200, 100, [50, 100, 200, 400])
+    station4 = RailroadBlock(pygame.transform.scale(pygame.transform.rotate(station4_image, 90), (80, 60)), "Station 4", 35, 1500, 100, [500, 1500, 3000, 6000])
     station4.rect.topleft = (640, 340)
     icons.append(pygame.transform.scale(station4_image, (300, 400)))
     board.addBlock(station4)
@@ -517,13 +517,13 @@ def generateGame() -> Game:
     board.addBlock(chance3)
     #
     ntu_image = pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/NTU.jpg"), 0)
-    ntu = StreetBlock(pygame.transform.scale(ntu_image, (80, 60)), "NTU", 37, 160, 80, [100, 100, 100, 100, 100], [20, 50, 80, 110, 200, 500], "purple",0)
+    ntu = StreetBlock(pygame.transform.scale(ntu_image, (80, 60)), "NTU", 37, 5600, 80, [2400, 2400, 2400, 2400, 2400], [1600 + i * 600 for i in range(6)], "purple",0)
     ntu.rect.topleft = (640, 460)
     icons.append(pygame.transform.scale(pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/NTU.jpg"), -90), (300, 400)))
     board.addBlock(ntu)
     #
     income_tax1_image = pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/Taxation.jpg"), 0)
-    income_tax1 = IncomeTaxBlock(pygame.transform.scale(income_tax1_image, (80, 60)), "Tax", 38, 200)
+    income_tax1 = IncomeTaxBlock(pygame.transform.scale(income_tax1_image, (80, 60)), "Tax", 38, 1500)
     income_tax1.rect.topleft = (640, 520)
     icons.append(pygame.transform.scale(pygame.transform.rotate(pygame.image.load("Assets/TaiwanBoard/Blocks/Taxation.jpg"), -90), (300, 400)))
     board.addBlock(income_tax1)
@@ -550,10 +550,10 @@ def generateGame() -> Game:
         Stock("Delta", 1000)
     ])
     player_icons = [
-        PlayerIcon(pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/PlayerIcons/Birdy.png"), (100, 100)), (235, 105)), 
-        PlayerIcon(pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/PlayerIcons/Birdy.png"), (100, 100)), (335, 105)), 
-        PlayerIcon(pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/PlayerIcons/Birdy.png"), (100, 100)), (435, 105)), 
-        PlayerIcon(pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/PlayerIcons/Birdy.png"), (100, 100)), (535, 105))
+        PlayerIcon(pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/PlayerIcons/catty.jpg"), (100, 100)), (235, 105)), 
+        PlayerIcon(pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/PlayerIcons/kitten.jpg"), (100, 100)), (335, 105)), 
+        PlayerIcon(pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/PlayerIcons/chidaomimmaomao.jpg"), (100, 100)), (435, 105)), 
+        PlayerIcon(pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/PlayerIcons/pop.jpg"), (100, 100)), (535, 105))
     ]
     players = [
         Player("Alice", 0, player_token[0], player_icons[0], StockMarketAccount(market), [Barrier() for _ in range(4)], balance = 25000, health_point = 100), 
@@ -568,7 +568,7 @@ def generateGame() -> Game:
         pygame.image.load("Assets/TaiwanBoard/raw/white.png"), 
         market, 
         pygame.image.load("Assets/TaiwanBoard/raw/white.png"), 
-        pygame.image.load("Assets/action menu/green.png"), 
+        pygame.image.load("Assets/TaiwanBoard/raw/white.png"), 
         icons, 
         [Pistol, Bomb, Digger, Turtle, Rabbit, Barrier, Lord, Reverse], 
         random_event_card_deck        

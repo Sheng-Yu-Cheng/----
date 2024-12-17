@@ -80,7 +80,7 @@ class ActionMenuWindow:
 class BlockInformation:
     def __init__(self, screen_size):
         self.screen_width, self.screen_height = screen_size
-        self.window = pygame.transform.scale(pygame.image.load("Assets/action menu/green.png"), (int(self.screen_width * 0.184), int(self.screen_height * 0.6)))
+        self.window = pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/raw/white.png"), (int(self.screen_width * 0.184), int(self.screen_height * 0.6)))
         self.window_rect = self.window.get_rect()
         self.window_rect.topleft = (405, 205)
         #
