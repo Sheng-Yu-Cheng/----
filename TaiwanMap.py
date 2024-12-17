@@ -84,7 +84,7 @@ def Digger() -> Prop:
     def digger(block: BLOCK, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players: List[Player], players: list[Player]):
         selected_blocks[0].house_amount = 0
     def filter(block, board, now_player_index, players):
-        return isinstance(block, PROPERTY_BLCOK) and block.owner != now_player_index and block.owner != None
+        return isinstance(block, StreetBlock) and block.owner != now_player_index and block.owner != None and block.house_amount > 0
     return Prop(
         "Digger", 
         pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/Props/Digger.jpg"), (180, 240)), 
