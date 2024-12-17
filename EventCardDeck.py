@@ -12,7 +12,7 @@ class EventCard:
             block_target_maxmium: int = 0, 
             need_player_selection: bool = False, 
             player_target_filter: Callable = lambda x, y, z, w: False,
-            player_target_maxmimum: int = 0, 
+            player_target_maximum: int = 0, 
             effect: Callable = lambda: None
         ):
         self.image = image
@@ -24,7 +24,7 @@ class EventCard:
         self.block_target_maxmium = block_target_maxmium
         self.need_player_selection = need_player_selection
         self.player_target_filter = player_target_filter
-        self.player_target_maxmimum = player_target_maxmimum
+        self.player_target_maximum = player_target_maximum
         self.selected = False
         #
         self.effect: Callable = effect

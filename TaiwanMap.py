@@ -196,7 +196,7 @@ def generateGame() -> Game:
         selected_blocks[0].owner = now_player.index
     def hogRiderBlockTargetFilter(block, board, now_player_index, players):
         return isinstance(block, BLOCK) and block.owner != now_player_index
-    chance_card_deck_list.append(EventCard(image_7, 2, need_block_selection=True, block_target_filter = hogRiderBlockTargetFilter, block_target_maxmium=1, effect=hogRider))
+    chance_card_deck_list.append(EventCard(image_7, 2, need_block_selection=True, block_target_filter = hogRiderBlockTargetFilter, block_target_maximum=1, effect=hogRider))
 
     # 撿到錢包
     image_8 = pygame.transform.scale(pygame.image.load("Assets/EventCards/Chance/撿到錢包.jpg"), (400, 580))
@@ -234,7 +234,7 @@ def generateGame() -> Game:
         now_player.token.rect.topleft = addCoordinates(now_block.rect.center, TOKEN_OFFSET[now_player.index])
     def moonlightPowerBlockTargetFilter(block, board, now_player_index, players):
         return True
-    community_chest_deck_list.append(EventCard(image_12, 10, need_block_selection=True, block_target_filter=moonlightPowerBlockTargetFilter, block_target_maxmium=1 , effect=moonlightPower))
+    community_chest_deck_list.append(EventCard(image_12, 10, need_block_selection=True, block_target_filter=moonlightPowerBlockTargetFilter, block_target_maximum=1 , effect=moonlightPower))
 
     # 出車禍
     image_13 = pygame.transform.scale(pygame.image.load("Assets/EventCards/CommunityChest/出車禍.jpg"), (400, 580))
