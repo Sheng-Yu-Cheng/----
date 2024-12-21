@@ -228,13 +228,30 @@ def generateGame() -> Game:
 
     # 月光刑警
     image_12 = pygame.transform.scale(pygame.image.load("Assets/EventCards/CommunityChest/月光刑警.jpg"), (400, 580))
-    def moonlightPower(block: BLOCK, selected_blocks: List[BLOCK], board: GameBoard, now_player: Player, selected_players: List[Player], players: list[Player]):
-        now_player.token_position = now_player.position = selected_blocks[0].index
-        now_block = board.blocks[board.prison_block_index]
+    def moonlightPower(
+            block: BLOCK, 
+            selected_blocks: List[BLOCK], 
+            board: GameBoard, 
+            now_player: Player, 
+            selected_players: List[Player], 
+            players: list[Player]
+        ):
+        now_block = selected_blocks[0]
+        now_player.token_position = now_player.position = now_block.index
         now_player.token.rect.topleft = addCoordinates(now_block.rect.center, TOKEN_OFFSET[now_player.index])
     def moonlightPowerBlockTargetFilter(block, board, now_player_index, players):
-        return True
-    community_chest_deck_list.append(EventCard(image_12, 10, need_block_selection=True, block_target_filter=moonlightPowerBlockTargetFilter, block_target_maximum=1 , effect=moonlightPower))
+        now_player = players[now_player_index]
+        return block.index != now_player.position
+    community_chest_deck_list.append(EventCard(
+        image_12, 5, 
+        need_block_selection = True, 
+        block_target_filter = moonlightPowerBlockTargetFilter, 
+        block_target_maximum = 1,
+        need_player_selection = False, 
+        player_target_filter = lambda  player, board, now_player_index, players: False, 
+        player_target_maximum = 0, 
+        effect = moonlightPower
+    ))
 
     # 出車禍
     image_13 = pygame.transform.scale(pygame.image.load("Assets/EventCards/CommunityChest/出車禍.jpg"), (400, 580))
@@ -556,10 +573,10 @@ def generateGame() -> Game:
         PlayerIcon(pygame.transform.scale(pygame.image.load("Assets/TaiwanBoard/PlayerIcons/pop.jpg"), (100, 100)), (535, 105))
     ]
     players = [
-        Player("pink", 0, player_token[0], player_icons[0], StockMarketAccount(market), [Rabbit(), Turtle()], balance = 25000, health_point = 100), 
-        Player("orange", 1, player_token[1], player_icons[1], StockMarketAccount(market), [Rabbit(), Turtle()], balance = 25000, health_point = 100), 
-        Player("green", 2, player_token[2], player_icons[2], StockMarketAccount(market), [Rabbit(), Turtle()], balance = 25000, health_point = 100), 
-        Player("blue", 3, player_token[3], player_icons[3], StockMarketAccount(market), [Rabbit(), Turtle()], balance = 25000, health_point = 100)
+        Player("pink", 0, player_token[0], player_icons[0], StockMarketAccount(market), [Rabbit(), Turtle(),Pistol(),Barrier()], balance = 25000, health_point = 100), 
+        Player("orange", 1, player_token[1], player_icons[1], StockMarketAccount(market), [Rabbit(), Turtle(),Pistol(),Barrier()], balance = 25000, health_point = 100), 
+        Player("green", 2, player_token[2], player_icons[2], StockMarketAccount(market), [Rabbit(), Turtle(),Pistol(),Barrier()], balance = 25000, health_point = 100), 
+        Player("blue", 3, player_token[3], player_icons[3], StockMarketAccount(market), [Rabbit(), Turtle(),Pistol(),Barrier()], balance = 25000, health_point = 100)
     ]
     game = Game(
         (1280, 720), 

@@ -418,7 +418,7 @@ class StockTransactions:
             rect_and_func.append((rect, minus_button_trigger_generator(stock_name)))
         return rect_and_func
 
-class PropsSection:
+class PropsSection: 
     def __init__(self, screen_size, background_image, prop_amount_limit: int):
         self.screen_width, self.screen_height = screen_size
         self.window = pygame.transform.scale(background_image, (int(self.screen_width * 0.4), int(self.screen_height / 4 * 3)))
@@ -441,6 +441,8 @@ class PropsSection:
     def updateToPlayer(self, player: Player):
         self.props_list = player.props
         for i, prop in enumerate(self.props_list):
+            if i >= self.prop_amount_limit:
+                break
             prop.setTopleft(addCoordinates(self.window_rect.topleft, self.props_list_topleft[i]))
     def updateToPropInfo(self, prop_info):
         i, j, self.prop_info_lines = 0, 10, 0

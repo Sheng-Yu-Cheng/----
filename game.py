@@ -36,7 +36,7 @@ class Game:
         #
         self.action_menu = ActionMenuWindow(screen_size, action_menu_background_image)
         self.block_information = BlockInformation(screen_size)
-        self.stock_source = SourceMarket([Source(2330,'台積電',20241130),Source(2308,'台大電子',20241130),Source(2317,'鴻海',20241130)])
+        # self.stock_source = SourceMarket([Source(2330,'台積電',20241130),Source(2308,'台大電子',20241130),Source(2317,'鴻海',20241130)])
         self.stock_transactions = StockTransactions(screen_size, stock_transaction_background_image, stock_market)
         self.board_center = BoardCenter(pygame.image.load("Assets/action menu/white.png"), pygame.Rect(100, 100, 540, 540), (105, 205), block_icons)
         self.prop_section = PropsSection(screen_size, prop_section_background_image, 4)
@@ -168,7 +168,7 @@ class Game:
                             _icon.selected = True
                             self.selected_players.append(_icon)
                             if len(self.selected_players) > prop_now_using.player_target_maximum:
-                                self.selected_players[0].icon.selected = False
+                                self.selected_players[0].selected = False
                                 self.selected_players.pop(0)
                     return trigger
                 rect_and_func.append((icon.rect, trigger_generator(icon)))
@@ -245,6 +245,8 @@ class Game:
                 selected_players.append(player)
                 player.icon.selected = False
             player.icon.disabled = True
+        self.selected_blocks = []
+        self.selected_players = []
         prop.doEffect(now_block, selected_blocks, self.board, now_player, selected_players, self.players)
         if prop in now_player.props:
             now_player.props.remove(prop)
@@ -487,26 +489,27 @@ class Game:
                 now_card.player_target_filter, 
                 now_card
             )
-            now_block.deck.now_card = None
         else:
             now_card.doEffect(now_block, [], self.board, now_player, [], self.players)
             now_block.deck.now_card = None
             self.startTransactionState()
     def confirmEventCardTargetSelection(self):
-        self.selected_blocks = []
-        self.selected_players = []
+        selected_blocks = []
+        selected_players = []
         for player in self.players:
             if player.icon.selected:
-                self.selected_players.append(player)
+                selected_players.append(player)
         for block in self.board.blocks:
             if block.status & BlockStatus.SELECTED:
-                self.selected_blocks.append(block)
+                selected_blocks.append(block)
                 block.status ^= BlockStatus.SELECTED
             block.status |= BlockStatus.ENABLED
+        self.selected_blocks = []
+        self.selected_players = []
         now_player = self.players[self.now_player_index]
         now_block = self.board.blocks[now_player.position]
         now_card = now_block.deck.now_card
-        now_card.doEffect(now_block, self.selected_blocks, self.board, self.selected_players, now_player, self.players)
+        now_card.doEffect(now_block, selected_blocks, self.board, now_player, selected_players, self.players)
         self.startTransactionState()
     def cancelEventCardTargetSelection(self):
         for block in self.board.blocks:
